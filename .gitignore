@@ -1,0 +1,12 @@
+# files uploaded while testing (the two demo reports are kept)
+storage/uploads/*
+!storage/uploads/.gitkeep
+!storage/uploads/.htaccess
+storage/avatars/*
+!storage/avatars/.gitkeep
+storage/reports/*
+!storage/reports/demo_r1.pdf
+!storage/reports/demo_r2.docx
+node_modules/
+.DS_Store
+Thumbs.db

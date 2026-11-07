@@ -1,0 +1,3 @@
+# Apache (XAMPP): open index.html by default and hide folder listings
+DirectoryIndex index.html
+Options -Indexes

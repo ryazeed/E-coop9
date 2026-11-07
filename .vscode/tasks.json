@@ -1,0 +1,15 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Start E-COOP (PHP server on port 8000)",
+      "type": "shell",
+      "command": "php -S localhost:8000 router.php",
+      "windows": { "command": "C:\\xampp\\php\\php.exe -S localhost:8000 router.php" },
+      "isBackground": true,
+      "problemMatcher": [],
+      "group": { "kind": "build", "isDefault": true },
+      "presentation": { "reveal": "always", "panel": "dedicated" }
+    }
+  ]
+}
