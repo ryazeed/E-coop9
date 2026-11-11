@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title data-t="academicReportsTitle">Academic Reports · E-COOP</title>
+<link rel="icon" href="../images/logo.png">
+<link rel="stylesheet" href="../css/style.css">
+<script src="../js/lang.js"></script>
+</head>
+<body>
+<!-- ===== header: logo, menu, notifications, language, account ===== -->
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <a class="brand" href="students.html"><img src="../images/logo.png" alt=""> E-COOP</a>
+    <nav class="nav" aria-label="Main menu">
+      <a href="students.html" data-t="navStudents">Students</a>
+      <a href="attendance.html" data-t="navAttendance">Attendance</a>
+      <a href="reports.html" data-t="navReports">Reports</a>
+      <a href="evaluations.html" data-t="navEvaluations">Evaluations</a>
+      <a href="academic.html" class="active" data-t="navAcademicReports">Academic Reports</a>
+    </nav>
+    <div class="top-actions">
+      <button class="top-btn" type="button" onclick="toggleNotifications()">&#128276; <span class="txt" data-t="notifications">Notifications</span><span class="count" id="notif-count" hidden>0</span></button>
+      <button class="top-btn" type="button" onclick="switchLanguage()" data-t="language">العربية</button>
+      <a class="top-btn" href="settings.html" title="Settings"><span class="avatar" id="me-avatar"></span><span class="txt" id="me-name"></span></a>
+    </div>
+  </div>
+  <div class="notif-panel" id="notif-panel" hidden>
+    <div class="notif-head"><b data-t="notifications">Notifications</b><button class="btn btn-sm btn-light" type="button" onclick="toggleNotifications()" data-t="close">Close</button></div>
+    <ul class="notif-list" id="notif-list"></ul>
+  </div>
+</header>
+
+<!-- ===== page title ===== -->
+<section class="hero">
+  <div class="wrap hero-in">
+    <div>
+      <h1 data-t="academicReportsTitle">Academic Reports</h1>
+      <p class="lead" id="lead"></p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== page content ===== -->
+<main class="wrap">
+  <div class="card no-print">
+    <div class="row" style="align-items:flex-end;justify-content:space-between">
+      <div class="form-3" style="flex:1;min-width:280px">
+        <div><label for="ar-sem" data-t="semester">Semester</label><select id="ar-sem"><option value="481" data-t="semester481">Semester 481</option></select></div>
+        <div><label for="ar-major" data-t="filterMajor">Major</label><select id="ar-major"></select></div>
+        <div><label for="ar-pl" data-t="cohort">Placement</label><select id="ar-pl"></select></div>
+      </div>
+      <div class="row">
+        <button class="btn btn-light" type="button" id="print-btn" data-t="printPdf">Print / PDF</button>
+        <button class="btn" type="button" id="csv-btn" data-t="exportExcel">Export Excel (CSV)</button>
+      </div>
+    </div>
+  </div>
+  <div id="report-out" class="section">
+    <div class="print-only"><p class="muted" data-t="college">Jubail Industrial College</p><h2 id="report-title"></h2><p class="muted small" id="report-meta"></p></div>
+    <div class="grid-3" id="report-stats"></div>
+    <div class="table-box section"><table><thead id="report-head"></thead><tbody id="report-body"></tbody></table></div>
+  </div>
+</main>
+
+<div id="toast" class="toast" hidden></div>
+<script src="../js/main.js"></script>
+<script src="../js/supervisor.js"></script>
+<script src="../js/reports.js"></script>
+<script>startPage('Supervisor', renderAcademic);</script>
+</body>
+</html>

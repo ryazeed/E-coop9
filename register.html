@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title data-t="createAccount">Create Account · E-COOP</title>
+<link rel="icon" href="images/logo.png">
+<link rel="stylesheet" href="css/style.css">
+<script src="js/lang.js"></script>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <a class="brand" href="index.html"><img src="images/logo.png" alt=""> E-COOP</a>
+    <nav class="nav"></nav>
+    <div class="top-actions">
+      <button class="top-btn" type="button" onclick="switchLanguage()" data-t="langSwitch">العربية</button>
+      <a class="top-btn" href="login.html" data-t="fSubmit">Sign In</a>
+    </div>
+  </div>
+</header>
+
+<main class="auth-page">
+  <div class="card">
+    <h1 style="font-size:24px" data-t="rTitle">Create your E-COOP account</h1>
+    <p class="muted" data-t="rLead">Students, academic supervisors and companies can register.</p>
+
+    <form class="form" id="register-form" novalidate>
+      <!-- account type -->
+      <div>
+        <label data-t="rType">I am a</label>
+        <div class="kinds">
+          <label class="chip"><input type="radio" name="kind" value="Student" checked> <span data-t="rStudent">Student</span></label>
+          <label class="chip"><input type="radio" name="kind" value="Supervisor"> <span data-t="rSupervisor">Supervisor</span></label>
+          <label class="chip"><input type="radio" name="kind" value="Company"> <span data-t="rCompany">Company</span></label>
+        </div>
+      </div>
+
+      <div><label for="r-name" id="r-name-label" data-t="rFullName">Full name</label><input type="text" id="r-name"><span class="error" id="r-name-err"></span></div>
+      <div><label for="r-email" id="r-email-label" data-t="rCollegeEmail">College email</label><input type="email" id="r-email" placeholder="name@jic.edu.sa"><span class="error" id="r-email-err"></span></div>
+      <div><label for="r-phone" data-t="rPhone">Mobile number</label><input type="tel" id="r-phone" placeholder="05XXXXXXXX"><span class="error" id="r-phone-err"></span></div>
+
+      <!-- student only -->
+      <div class="form-2" id="student-fields">
+        <div><label for="r-major" data-t="rMajor">Major</label>
+          <select id="r-major">
+            <option>Business Administration</option><option>Chemical Engineering</option><option>Industrial Engineering</option>
+            <option>Mechanical Engineering</option><option>Electrical Engineering</option><option>Computer Science</option><option>Chemistry</option>
+          </select></div>
+        <div><label for="r-gpa" data-t="rGpa">GPA (out of 5)</label><input type="text" id="r-gpa" inputmode="decimal"><span class="error" id="r-gpa-err"></span></div>
+      </div>
+
+      <!-- supervisor only -->
+      <div id="supervisor-fields" hidden><label for="r-dept" data-t="major">Department</label>
+        <select id="r-dept">
+          <option>Business Administration</option><option>Chemical Engineering Technology</option><option>Industrial Engineering Technology</option>
+          <option>Mechanical Engineering Technology</option><option>Electrical Engineering Technology</option><option>Computer Science</option>
+        </select></div>
+
+      <!-- company only -->
+      <div id="company-fields" hidden>
+        <label for="r-city" data-t="rCity">City</label><select id="r-city"></select>
+        <p class="alert alert-info small" style="margin-top:10px" data-t="rCompanyNote">You can post opportunities once the COOP office approves your company.</p>
+      </div>
+
+      <div class="form-2">
+        <div><label for="r-pass" data-t="rPass">Password</label><input type="password" id="r-pass" autocomplete="new-password"><span class="help" data-t="rPassHelp">At least 8 characters, with a letter and a number.</span><span class="error" id="r-pass-err"></span></div>
+        <div><label for="r-pass2" data-t="rPass2">Confirm password</label><input type="password" id="r-pass2" autocomplete="new-password"><span class="error" id="r-pass2-err"></span></div>
+      </div>
+      <div><label style="font-weight:400"><input type="checkbox" id="r-agree"> <span data-t="rAgree">I agree to the cooperative training policy and the PDPL personal data terms.</span></label><span class="error" id="r-agree-err"></span></div>
+
+      <p class="alert alert-danger" id="server-error" role="alert" hidden></p>
+      <button class="btn btn-block" type="submit" id="r-submit" data-t="rSubmit">Create Account</button>
+      <p class="small"><span data-t="haveAccount">Already have an account?</span> <a href="login.html" data-t="signInLink">Sign in</a></p>
+    </form>
+  </div>
+</main>
+
+<div id="toast" class="toast" hidden></div>
+<script src="js/main.js"></script>
+<script src="js/public.js"></script>
+<script>startPage(null, renderRegister);</script>
+</body>
+</html>

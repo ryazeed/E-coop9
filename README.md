@@ -6,7 +6,7 @@ A complete web system for managing cooperative training (COOP): students apply t
 
 | Layer | Technology |
 |---|---|
-| Front end | HTML, CSS, JavaScript (React 18, included locally in `js/vendor`) |
+| Front end | HTML pages (one file per screen) + CSS + small JavaScript files — no frameworks |
 | Back end | PHP 8 (PDO, sessions, `password_hash`) — REST-style JSON API in `api/` |
 | Database | MySQL / MariaDB — 19 tables, 30 foreign keys, CHECK rules, 12 triggers, 2 stored procedures, 4 views |
 
@@ -76,33 +76,40 @@ A complete web system for managing cooperative training (COOP): students apply t
 
 ```
 E-COOP-PHP/
-├── index.html              the web page (loads the CSS and JavaScript files)
-├── install.php             one-click database setup / demo reset
-├── router.php              router for "php -S" (blocks private folders)
-├── css/style.css           all styles
+├── index.html              home page (features, how it works, roles, contact form)
+├── login.html              sign in + demo accounts
+├── register.html           create an account (student, supervisor, company)
+├── student/                dashboard, opportunities, applications, attendance, report, settings (.html)
+├── company/                overview, postings, applicants, dailycode, trainees, settings (.html)
+├── supervisor/             students, attendance, reports, evaluations, academic, settings (.html)
+├── admin/                  analytics, approvals, users, assign, audit, reports, settings (.html)
+├── css/style.css           all styles (light/dark theme, Arabic right-to-left, phone sizes)
+├── images/logo.png
 ├── js/
-│   ├── api.js              talks to the PHP API (fetch), server-side file storage
-│   ├── vendor/             React 18 (local copy)
-│   ├── ui-kit.js           shared UI components (buttons, badges, code input)
-│   ├── i18n.js             English + Arabic text
-│   ├── data.js, services.js, landing.js, logo.js
-│   └── app/                core.js, student.js, company.js, supervisor.js, admin.js, reports.js, shell.js …
-├── api/
+│   ├── lang.js             English + Arabic text, Saudi cities
+│   ├── main.js             shared: talks to the API, header, notifications, helpers
+│   ├── public.js           home, sign in, register
+│   ├── student.js  company.js  supervisor.js  admin.js   one file per role
+│   ├── reports.js          report tables, CSV export, print
+│   └── settings.js         profile, photo, notification settings, language, theme
+├── api/                    PHP back end (JSON)
 │   ├── config.php          database settings (XAMPP: root, empty password)
-│   ├── state.php           GET  – the signed-in user + the data for the screens
+│   ├── state.php           GET  – the signed-in user + the data for the pages
 │   ├── auth.php            POST – login / logout / register
 │   ├── action.php          POST – every change (apply, accept, check-in, approve …)
 │   ├── upload.php          POST – final report upload (PDF/DOCX, 10 MB)
 │   ├── file.php            GET  – open a report / profile photo (with permission check)
 │   └── lib/                bootstrap.php (PDO, sessions, errors), state.php, actions.php
+├── install.php             one-click database setup / demo reset
+├── router.php              router for "php -S" (blocks private folders)
 ├── database/ecoop.sql      schema + rules + demo data (one file)
 ├── storage/                uploaded files (not public)
 ├── docs/ERD.png, ERD.pdf   the numbered ERD
-└── tests/                  api_test.py (86 API checks), ui_test.js (browser walkthrough)
+└── tests/                  api_test.py (86 API checks), ui_test.js (browser test of every page)
 ```
 
 ### How a request works
-1. The page loads `api/state.php` → PHP reads MySQL and returns the data for the signed-in user.
+1. Each HTML page loads `api/state.php` → PHP reads MySQL and returns the data for the signed-in user; the page's JavaScript puts it into the tables and cards.
 2. A button (e.g. **Approve**) sends `{ "type": "attDecision", ... }` to `api/action.php`.
 3. PHP checks the session role and ownership, runs the SQL with prepared statements (PDO), MySQL checks its own rules (CHECK / UNIQUE / triggers), and PHP returns the fresh data.
 
@@ -131,6 +138,6 @@ E-COOP-PHP/
 With the server running on port 8000:
 ```
 python tests/api_test.py http://localhost:8000     # 86 checks: every action, permissions and database rules
-node tests/ui_test.js http://localhost:8000         # browser walkthrough (needs: npm i playwright)
+node tests/ui_test.js http://localhost:8000         # browser test of every page (needs: npm i playwright)
 ```
 The tests reset the demo database first.

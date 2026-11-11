@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title data-t="settingsTitle">Settings · E-COOP</title>
+<link rel="icon" href="../images/logo.png">
+<link rel="stylesheet" href="../css/style.css">
+<script src="../js/lang.js"></script>
+</head>
+<body>
+<!-- ===== header: logo, menu, notifications, language, account ===== -->
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <a class="brand" href="overview.html"><img src="../images/logo.png" alt=""> E-COOP</a>
+    <nav class="nav" aria-label="Main menu">
+      <a href="overview.html" data-t="navOverview">Overview</a>
+      <a href="postings.html" data-t="navPostings">Postings</a>
+      <a href="applicants.html" data-t="navApplicants">Applicants</a>
+      <a href="dailycode.html" data-t="navDailyCode">Daily Code</a>
+      <a href="trainees.html" data-t="navTrainees">Trainees</a>
+    </nav>
+    <div class="top-actions">
+      <button class="top-btn" type="button" onclick="toggleNotifications()">&#128276; <span class="txt" data-t="notifications">Notifications</span><span class="count" id="notif-count" hidden>0</span></button>
+      <button class="top-btn" type="button" onclick="switchLanguage()" data-t="language">العربية</button>
+      <a class="top-btn" href="settings.html" title="Settings"><span class="avatar" id="me-avatar"></span><span class="txt" id="me-name"></span></a>
+    </div>
+  </div>
+  <div class="notif-panel" id="notif-panel" hidden>
+    <div class="notif-head"><b data-t="notifications">Notifications</b><button class="btn btn-sm btn-light" type="button" onclick="toggleNotifications()" data-t="close">Close</button></div>
+    <ul class="notif-list" id="notif-list"></ul>
+  </div>
+</header>
+
+<!-- ===== page title ===== -->
+<section class="hero">
+  <div class="wrap hero-in">
+    <div>
+      <h1 data-t="settingsTitle">Settings</h1>
+    </div>
+    <div class="glass row" style="gap:16px">
+      <span id="photo-box"></span>
+      <div>
+        <p class="glass-value" id="set-name" style="margin:0"></p>
+        <p id="set-sub"></p>
+        <div class="row" style="margin-top:8px">
+          <label class="btn btn-sm btn-light" style="margin:0" for="photo-input" data-t="changePhoto">Change photo</label>
+          <input type="file" id="photo-input" accept="image/png,image/jpeg,image/webp" class="sr-only">
+          <button class="btn btn-sm btn-light" type="button" id="photo-remove" data-t="removePhoto" hidden>Remove photo</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== page content ===== -->
+<main class="wrap">
+  <div class="split split-even">
+    <div>
+      <section class="section">
+        <h2 data-t="profileSection">Profile</h2>
+        <div class="card" style="margin-top:12px">
+        <form class="form" id="company-form" novalidate>
+          <div><label for="c-name" data-t="cpName">Company name</label><input type="text" id="c-name"><span class="error" id="c-name-err"></span></div>
+          <div><label for="c-email" data-t="email">Email</label><input type="email" id="c-email" disabled></div>
+          <div class="form-2">
+            <div><label for="c-city" data-t="city">City</label><select id="c-city"></select></div>
+            <div><label for="c-phone" data-t="phone">Phone</label><input type="tel" id="c-phone"><span class="error" id="c-phone-err"></span></div>
+          </div>
+          <div class="row row-end"><button class="btn" type="submit" data-t="save">Save</button></div>
+        </form>
+        </div>
+      </section>
+      <section class="section">
+        <div class="card row">
+          <button class="btn btn-danger" type="button" onclick="signOut()" data-t="signOut">Sign Out</button>
+        </div>
+      </section>
+    </div>
+    <div>
+      <section class="section">
+        <h2 data-t="notifSection">Notifications</h2>
+        <div class="card" style="margin-top:12px">
+          <div class="switch-row"><div><b data-t="pAttendance">Attendance</b><span class="muted small" data-t="pAttendanceD"></span></div><input type="checkbox" class="pref" data-key="attendance"></div>
+          <div class="switch-row"><div><b data-t="pApplications">Applications</b><span class="muted small" data-t="pApplicationsD"></span></div><input type="checkbox" class="pref" data-key="applications"></div>
+          <div class="switch-row"><div><b data-t="pReports">Reports</b><span class="muted small" data-t="pReportsD"></span></div><input type="checkbox" class="pref" data-key="reports"></div>
+          <div class="switch-row"><div><b data-t="pSummary">Weekly summary</b><span class="muted small" data-t="pSummaryD"></span></div><input type="checkbox" class="pref" data-key="summary"></div>
+        </div>
+      </section>
+      <section class="section">
+        <h2 data-t="appearance">Appearance</h2>
+        <div class="card form" style="margin-top:12px">
+          <div><label for="set-lang" data-t="languageLabel">Language</label>
+            <select id="set-lang"><option value="en">English</option><option value="ar">العربية</option></select></div>
+          <div><label for="set-theme" data-t="themeLabel">Theme</label>
+            <select id="set-theme"><option value="light" data-t="themeLight">Light</option><option value="dark" data-t="themeDark">Dark</option></select></div>
+        </div>
+      </section>
+    </div>
+  </div>
+</main>
+
+<div id="toast" class="toast" hidden></div>
+<script src="../js/main.js"></script>
+<script src="../js/company.js"></script>
+<script src="../js/settings.js"></script>
+<script>startPage('Company', renderSettings);</script>
+</body>
+</html>

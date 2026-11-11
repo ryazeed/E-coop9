@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title data-t="reportTitle">Final Report · E-COOP</title>
+<link rel="icon" href="../images/logo.png">
+<link rel="stylesheet" href="../css/style.css">
+<script src="../js/lang.js"></script>
+</head>
+<body>
+<!-- ===== header: logo, menu, notifications, language, account ===== -->
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <a class="brand" href="dashboard.html"><img src="../images/logo.png" alt=""> E-COOP</a>
+    <nav class="nav" aria-label="Main menu">
+      <a href="dashboard.html" data-t="navDashboard">Dashboard</a>
+      <a href="opportunities.html" data-t="navOpportunities">Opportunities</a>
+      <a href="applications.html" data-t="navApplications">Applications</a>
+      <a href="attendance.html" data-t="navAttendance">Attendance</a>
+      <a href="report.html" class="active" data-t="navReport">Final Report</a>
+    </nav>
+    <div class="top-actions">
+      <button class="top-btn" type="button" onclick="toggleNotifications()">&#128276; <span class="txt" data-t="notifications">Notifications</span><span class="count" id="notif-count" hidden>0</span></button>
+      <button class="top-btn" type="button" onclick="switchLanguage()" data-t="language">العربية</button>
+      <a class="top-btn" href="settings.html" title="Settings"><span class="avatar" id="me-avatar"></span><span class="txt" id="me-name"></span></a>
+    </div>
+  </div>
+  <div class="notif-panel" id="notif-panel" hidden>
+    <div class="notif-head"><b data-t="notifications">Notifications</b><button class="btn btn-sm btn-light" type="button" onclick="toggleNotifications()" data-t="close">Close</button></div>
+    <ul class="notif-list" id="notif-list"></ul>
+  </div>
+</header>
+
+<!-- ===== page title ===== -->
+<section class="hero">
+  <div class="wrap hero-in">
+    <div>
+      <h1 data-t="reportTitle">Final Training Report</h1>
+      <p class="lead" id="lead"></p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== page content ===== -->
+<main class="wrap">
+  <div id="no-placement" class="card empty" hidden><b data-t="noPlacementAttendance">Attendance opens once you have an active placement.</b></div>
+
+  <div class="card" id="report-box" hidden style="max-width:720px">
+    <!-- current report -->
+    <div id="current-report" class="row" hidden>
+      <a id="report-link" class="btn btn-light" target="_blank">&#128196; <span id="report-file"></span></a>
+      <span id="report-badge"></span>
+    </div>
+    <div class="alert alert-success" id="report-approved" hidden data-t="reportApproved">Your final report was approved.</div>
+    <div class="alert alert-warning" id="report-revision" hidden data-t="revisionNote">Your supervisor requested a revision.</div>
+
+    <!-- upload a new report -->
+    <form id="upload-form" class="form" hidden>
+      <div class="file-box">
+        <label for="report-input" data-t="reportFile">Report file</label>
+        <input type="file" id="report-input" accept=".pdf,.docx">
+        <span class="help" data-t="fileHint">PDF or DOCX, max 10 MB</span>
+      </div>
+      <p class="error" id="upload-error"></p>
+      <div class="row row-end"><button class="btn" type="submit" id="upload-btn" data-t="submitReport">Submit Training Report</button></div>
+    </form>
+  </div>
+
+  <section class="section">
+    <h2 data-t="evaluations">Evaluations</h2>
+    <div id="eval-list" style="margin-top:12px"></div>
+  </section>
+</main>
+
+<div id="toast" class="toast" hidden></div>
+<script src="../js/main.js"></script>
+<script src="../js/student.js"></script>
+<script>startPage('Student', renderReport);</script>
+</body>
+</html>

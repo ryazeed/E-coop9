@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title data-t="browseOpps">Opportunities · E-COOP</title>
+<link rel="icon" href="../images/logo.png">
+<link rel="stylesheet" href="../css/style.css">
+<script src="../js/lang.js"></script>
+</head>
+<body>
+<!-- ===== header: logo, menu, notifications, language, account ===== -->
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <a class="brand" href="dashboard.html"><img src="../images/logo.png" alt=""> E-COOP</a>
+    <nav class="nav" aria-label="Main menu">
+      <a href="dashboard.html" data-t="navDashboard">Dashboard</a>
+      <a href="opportunities.html" class="active" data-t="navOpportunities">Opportunities</a>
+      <a href="applications.html" data-t="navApplications">Applications</a>
+      <a href="attendance.html" data-t="navAttendance">Attendance</a>
+      <a href="report.html" data-t="navReport">Final Report</a>
+    </nav>
+    <div class="top-actions">
+      <button class="top-btn" type="button" onclick="toggleNotifications()">&#128276; <span class="txt" data-t="notifications">Notifications</span><span class="count" id="notif-count" hidden>0</span></button>
+      <button class="top-btn" type="button" onclick="switchLanguage()" data-t="language">العربية</button>
+      <a class="top-btn" href="settings.html" title="Settings"><span class="avatar" id="me-avatar"></span><span class="txt" id="me-name"></span></a>
+    </div>
+  </div>
+  <div class="notif-panel" id="notif-panel" hidden>
+    <div class="notif-head"><b data-t="notifications">Notifications</b><button class="btn btn-sm btn-light" type="button" onclick="toggleNotifications()" data-t="close">Close</button></div>
+    <ul class="notif-list" id="notif-list"></ul>
+  </div>
+</header>
+
+<!-- ===== page title ===== -->
+<section class="hero">
+  <div class="wrap hero-in">
+    <div>
+      <h1 data-t="browseOpps">Browse COOP Opportunities</h1>
+      <p class="lead" id="lead"></p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== page content ===== -->
+<main class="wrap">
+  <div class="alert alert-info" id="placed-alert" hidden data-t="alreadyPlaced">You have an active placement, so you can't apply for other opportunities.</div>
+
+  <!-- search and filters -->
+  <div class="card filters">
+    <div><label for="f-q" data-t="searchOpps">Search by title or company</label><input type="search" id="f-q"></div>
+    <div><label for="f-major" data-t="filterMajor">Major</label><select id="f-major"></select></div>
+    <div><label for="f-city" data-t="filterCity">City</label><select id="f-city"></select></div>
+  </div>
+
+  <!-- opportunity cards -->
+  <div class="grid" id="opp-list"></div>
+</main>
+
+<div id="toast" class="toast" hidden></div>
+<script src="../js/main.js"></script>
+<script src="../js/student.js"></script>
+<script>startPage('Student', renderOpportunities);</script>
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title data-t="attendanceTitle">Attendance · E-COOP</title>
+<link rel="icon" href="../images/logo.png">
+<link rel="stylesheet" href="../css/style.css">
+<script src="../js/lang.js"></script>
+</head>
+<body>
+<!-- ===== header: logo, menu, notifications, language, account ===== -->
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <a class="brand" href="dashboard.html"><img src="../images/logo.png" alt=""> E-COOP</a>
+    <nav class="nav" aria-label="Main menu">
+      <a href="dashboard.html" data-t="navDashboard">Dashboard</a>
+      <a href="opportunities.html" data-t="navOpportunities">Opportunities</a>
+      <a href="applications.html" data-t="navApplications">Applications</a>
+      <a href="attendance.html" class="active" data-t="navAttendance">Attendance</a>
+      <a href="report.html" data-t="navReport">Final Report</a>
+    </nav>
+    <div class="top-actions">
+      <button class="top-btn" type="button" onclick="toggleNotifications()">&#128276; <span class="txt" data-t="notifications">Notifications</span><span class="count" id="notif-count" hidden>0</span></button>
+      <button class="top-btn" type="button" onclick="switchLanguage()" data-t="language">العربية</button>
+      <a class="top-btn" href="settings.html" title="Settings"><span class="avatar" id="me-avatar"></span><span class="txt" id="me-name"></span></a>
+    </div>
+  </div>
+  <div class="notif-panel" id="notif-panel" hidden>
+    <div class="notif-head"><b data-t="notifications">Notifications</b><button class="btn btn-sm btn-light" type="button" onclick="toggleNotifications()" data-t="close">Close</button></div>
+    <ul class="notif-list" id="notif-list"></ul>
+  </div>
+</header>
+
+<!-- ===== page title ===== -->
+<section class="hero">
+  <div class="wrap hero-in">
+    <div>
+      <p class="eyebrow" id="eyebrow"></p>
+      <h1 data-t="attendanceTitle">Attendance</h1>
+      <p class="lead" id="lead"></p>
+    </div>
+    <div class="glass">
+      <div class="glass-top"><span id="glass-label"></span><span class="glass-value" id="glass-value"></span></div>
+      <div class="glass-bar"><span id="glass-bar" style="width:0%"></span></div>
+      <p id="glass-note"></p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== page content ===== -->
+<main class="wrap">
+  <div id="no-placement" class="card empty" hidden>
+    <b data-t="noPlacementAttendance">Attendance opens once you have an active placement.</b>
+    <p><a class="btn" href="opportunities.html" data-t="browseOpps">Browse COOP Opportunities</a></p>
+  </div>
+
+  <div id="attendance-box" hidden>
+    <!-- today's code (6 boxes) -->
+    <form class="card" id="code-form" autocomplete="off">
+      <div class="alert alert-success" id="today-done" hidden></div>
+      <label data-t="codeLabel">Today's attendance code</label>
+      <div class="code-boxes" id="code-boxes">
+        <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 1">
+        <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 2">
+        <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 3">
+        <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 4">
+        <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 5">
+        <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 6">
+      </div>
+      <span class="help" data-t="codeHelp">Enter the six-digit code from your company.</span>
+      <p class="error" id="code-error"></p>
+      <p class="alert alert-success" id="code-ok" hidden></p>
+      <p class="small muted"><span class="badge" data-t="demo">Demo</span> <span data-t="demoCodeHint">Demo: today's code is shown on the Company account's Daily Code page.</span></p>
+    </form>
+
+    <!-- history -->
+    <section class="section">
+      <h2 data-t="history">History</h2>
+      <div style="margin-top:12px">
+  <div class="table-box">
+    <table>
+      <thead><tr><th data-t="date">Date</th><th data-t="checkInTime">Check-in</th><th data-t="status">Status</th></tr></thead>
+      <tbody id="history-body"></tbody>
+    </table>
+  </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<div id="toast" class="toast" hidden></div>
+<script src="../js/main.js"></script>
+<script src="../js/student.js"></script>
+<script>startPage('Student', renderAttendance);</script>
+</body>
+</html>

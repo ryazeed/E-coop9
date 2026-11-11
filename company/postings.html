@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title data-t="myPostings">Postings · E-COOP</title>
+<link rel="icon" href="../images/logo.png">
+<link rel="stylesheet" href="../css/style.css">
+<script src="../js/lang.js"></script>
+</head>
+<body>
+<!-- ===== header: logo, menu, notifications, language, account ===== -->
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <a class="brand" href="overview.html"><img src="../images/logo.png" alt=""> E-COOP</a>
+    <nav class="nav" aria-label="Main menu">
+      <a href="overview.html" data-t="navOverview">Overview</a>
+      <a href="postings.html" class="active" data-t="navPostings">Postings</a>
+      <a href="applicants.html" data-t="navApplicants">Applicants</a>
+      <a href="dailycode.html" data-t="navDailyCode">Daily Code</a>
+      <a href="trainees.html" data-t="navTrainees">Trainees</a>
+    </nav>
+    <div class="top-actions">
+      <button class="top-btn" type="button" onclick="toggleNotifications()">&#128276; <span class="txt" data-t="notifications">Notifications</span><span class="count" id="notif-count" hidden>0</span></button>
+      <button class="top-btn" type="button" onclick="switchLanguage()" data-t="language">العربية</button>
+      <a class="top-btn" href="settings.html" title="Settings"><span class="avatar" id="me-avatar"></span><span class="txt" id="me-name"></span></a>
+    </div>
+  </div>
+  <div class="notif-panel" id="notif-panel" hidden>
+    <div class="notif-head"><b data-t="notifications">Notifications</b><button class="btn btn-sm btn-light" type="button" onclick="toggleNotifications()" data-t="close">Close</button></div>
+    <ul class="notif-list" id="notif-list"></ul>
+  </div>
+</header>
+
+<!-- ===== page title ===== -->
+<section class="hero">
+  <div class="wrap hero-in">
+    <div>
+      <h1 data-t="myPostings">Your Postings</h1>
+      <p class="lead" id="lead"></p>
+    </div>
+    <button class="hero-btn" type="button" id="new-btn" onclick="showPostForm(true)">&#10133; <span data-t="postOpp">Post Opportunity</span></button>
+  </div>
+</section>
+
+<!-- ===== page content ===== -->
+<main class="wrap">
+  <div class="alert alert-warning" id="pending-alert" hidden><b data-t="companyPendingTitle">Your company is waiting for approval</b><br><span data-t="companyPendingBody"></span></div>
+
+  <!-- new opportunity form -->
+  <div class="card" id="post-box" hidden>
+    <form class="form" id="post-form" novalidate>
+      <h2 data-t="postTitle">Post a New Opportunity</h2>
+      <div>
+        <label data-t="quickTemplates">Quick templates</label>
+        <div class="chips" id="templates">
+          <button type="button" class="chip" data-title="Supply Chain Analyst Trainee" data-major="Business Administration" data-desc="Track inbound shipments, reconcile warehouse stock counts and prepare weekly KPI summaries.">Supply Chain Analyst Trainee</button>
+          <button type="button" class="chip" data-title="HR Operations Trainee" data-major="Business Administration" data-desc="Help run onboarding, update employee records and prepare attendance reports for payroll.">HR Operations Trainee</button>
+          <button type="button" class="chip" data-title="Procurement Assistant Trainee" data-major="Business Administration" data-desc="Prepare purchase requests, compare supplier quotations and follow up delivery dates.">Procurement Assistant Trainee</button>
+          <button type="button" class="chip" data-title="Accounts Payable Trainee" data-major="Business Administration" data-desc="Match invoices to purchase orders, prepare payment batches and reconcile vendor statements.">Accounts Payable Trainee</button>
+          <button type="button" class="chip" data-title="Maintenance Planning Trainee" data-major="Mechanical Engineering" data-desc="Schedule preventive maintenance work orders and follow up spare-part requests with stores.">Maintenance Planning Trainee</button>
+          <button type="button" class="chip" data-title="Process Engineering Trainee" data-major="Chemical Engineering" data-desc="Support the operations team with process monitoring, shift logs and daily production reports.">Process Engineering Trainee</button>
+          <button type="button" class="chip" data-title="IT Support Trainee" data-major="Computer Science" data-desc="Handle first-line support tickets, set up user devices and keep the asset register current.">IT Support Trainee</button>
+        </div>
+        <span class="help" data-t="templatesHelp">Pick a template, then edit it.</span>
+      </div>
+      <div><label for="o-title" data-t="oppTitle">Opportunity title</label><input type="text" id="o-title" placeholder="e.g. Procurement Analyst Trainee"><span class="error" id="o-title-err"></span></div>
+      <div class="form-3">
+        <div><label for="o-city" data-t="city">City</label><select id="o-city"></select></div>
+        <div><label for="o-major" data-t="majorReq">Major requirements</label>
+          <select id="o-major">
+            <option>Business Administration</option><option>Chemical Engineering</option><option>Industrial Engineering</option>
+            <option>Mechanical Engineering</option><option>Electrical Engineering</option><option>Computer Science</option>
+          </select></div>
+        <div><label for="o-cap" data-t="capacity">Capacity</label><input type="number" id="o-cap" min="1" max="20" value="2"><span class="help">1 – 20</span></div>
+      </div>
+      <div><label for="o-desc" data-t="description">Description</label><textarea id="o-desc"></textarea><span class="error" id="o-desc-err"></span></div>
+      <div class="row row-end">
+        <button class="btn btn-light" type="button" onclick="showPostForm(false)" data-t="cancel">Cancel</button>
+        <button class="btn" type="submit" data-t="postOpp">Post Opportunity</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- my postings -->
+  <section class="section">
+  <div class="table-box">
+    <table>
+      <thead><tr><th data-t="opportunity">Opportunity</th><th data-t="city">City</th><th data-t="seats" class="num">Seats</th><th data-t="navApplicants" class="num">Applicants</th><th data-t="postedOn">Posted</th><th data-t="status">Status</th></tr></thead>
+      <tbody id="postings-body"></tbody>
+    </table>
+  </div>
+  </section>
+</main>
+
+<div id="toast" class="toast" hidden></div>
+<script src="../js/main.js"></script>
+<script src="../js/company.js"></script>
+<script>startPage('Company', renderPostings);</script>
+</body>
+</html>

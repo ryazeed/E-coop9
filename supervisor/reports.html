@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title data-t="reportsTitle">Reports · E-COOP</title>
+<link rel="icon" href="../images/logo.png">
+<link rel="stylesheet" href="../css/style.css">
+<script src="../js/lang.js"></script>
+</head>
+<body>
+<!-- ===== header: logo, menu, notifications, language, account ===== -->
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <a class="brand" href="students.html"><img src="../images/logo.png" alt=""> E-COOP</a>
+    <nav class="nav" aria-label="Main menu">
+      <a href="students.html" data-t="navStudents">Students</a>
+      <a href="attendance.html" data-t="navAttendance">Attendance</a>
+      <a href="reports.html" class="active" data-t="navReports">Reports</a>
+      <a href="evaluations.html" data-t="navEvaluations">Evaluations</a>
+      <a href="academic.html" data-t="navAcademicReports">Academic Reports</a>
+    </nav>
+    <div class="top-actions">
+      <button class="top-btn" type="button" onclick="toggleNotifications()">&#128276; <span class="txt" data-t="notifications">Notifications</span><span class="count" id="notif-count" hidden>0</span></button>
+      <button class="top-btn" type="button" onclick="switchLanguage()" data-t="language">العربية</button>
+      <a class="top-btn" href="settings.html" title="Settings"><span class="avatar" id="me-avatar"></span><span class="txt" id="me-name"></span></a>
+    </div>
+  </div>
+  <div class="notif-panel" id="notif-panel" hidden>
+    <div class="notif-head"><b data-t="notifications">Notifications</b><button class="btn btn-sm btn-light" type="button" onclick="toggleNotifications()" data-t="close">Close</button></div>
+    <ul class="notif-list" id="notif-list"></ul>
+  </div>
+</header>
+
+<!-- ===== page title ===== -->
+<section class="hero">
+  <div class="wrap hero-in">
+    <div>
+      <h1 data-t="reportsTitle">Training Reports</h1>
+      <p class="lead" id="lead"></p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== page content ===== -->
+<main class="wrap">
+  <div class="table-box">
+    <table>
+      <thead><tr><th data-t="student">Student</th><th data-t="file">File</th><th data-t="submitted">Submitted</th><th data-t="status">Status</th><th data-t="actions">Actions</th></tr></thead>
+      <tbody id="reports-body"></tbody>
+    </table>
+  </div>
+</main>
+
+<div id="toast" class="toast" hidden></div>
+<script src="../js/main.js"></script>
+<script src="../js/supervisor.js"></script>
+<script>startPage('Supervisor', renderSupReports);</script>
+</body>
+</html>

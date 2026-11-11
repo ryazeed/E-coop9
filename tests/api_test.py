@@ -56,7 +56,7 @@ check('attendance saved as Pending for today', len(mine) == 1 and mine[0]['statu
 check('second check-in the same day refused (BR-16)', ahmed.act(type='checkIn', code=code)['code'] == 'code_duplicate')
 
 abd = U('abdullah.alghamdi@jic.edu.sa')
-check('no code yet -> code_none', abd.act(type='checkIn', code='123456')['code'] == 'code_none')
+check('no code yet -> code_none (or wrong code when the demo already has today\'s code)', abd.act(type='checkIn', code='123456')['code'] in ('code_none', 'code_invalid'))
 gcode = [k['code'] for k in gulf.act(type='genCode', placement='p2')['state']['codes'] if k['status'] == 'Active'][0]
 bad = '999999' if gcode != '999999' else '888888'
 for i in range(5): r = abd.act(type='checkIn', code=bad)

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title data-t="fSubmit">Sign In · E-COOP</title>
+<link rel="icon" href="images/logo.png">
+<link rel="stylesheet" href="css/style.css">
+<script src="js/lang.js"></script>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <a class="brand" href="index.html"><img src="images/logo.png" alt=""> E-COOP</a>
+    <nav class="nav"></nav>
+    <div class="top-actions">
+      <button class="top-btn" type="button" onclick="switchLanguage()" data-t="langSwitch">العربية</button>
+      <a class="top-btn" href="index.html" data-t="home">Home</a>
+    </div>
+  </div>
+</header>
+
+<main class="auth-page">
+  <div class="card">
+    <!-- sign in with e-mail and password -->
+    <h1 style="font-size:24px" data-t="signInTitle">Sign in to E-COOP</h1>
+    <p class="muted" data-t="hLead">Sign in with your email to follow your placement, attendance, reports and evaluations.</p>
+    <form class="form" id="login-form" novalidate>
+      <div><label for="h-email" data-t="fEmail">Email</label><input type="email" id="h-email" autocomplete="username" data-t-ph="fEmailPh"></div>
+      <div><label for="h-pass" data-t="fPass">Password</label><input type="password" id="h-pass" autocomplete="current-password" data-t-ph="fPassPh"></div>
+      <p class="error" id="login-error" role="alert"></p>
+      <button class="btn btn-block" type="submit" data-t="fSubmit">Sign In</button>
+      <p class="small muted" data-t="fTerms">By signing in, you agree to the Jubail Industrial College cooperative training policy.</p>
+      <p class="small"><span data-t="newHere">New to E-COOP?</span> <a href="register.html" data-t="createAccount">Create Account</a></p>
+    </form>
+
+    <!-- demo accounts: one click signs in with the demo password -->
+    <h2 style="font-size:18px;margin-top:22px" data-t="demoAccounts">Demo accounts</h2>
+    <p class="small muted"><span data-t="demoPasswordHint">Password for every demo account:</span> <b class="mono">Coop@2026</b></p>
+    <ul class="demo-list">
+      <li><span class="avatar">AA</span><div class="info"><b>Ahmed Abdulmohsen Almousa</b><small data-t="descFaisal">Placed at Eastern Logistics. Log attendance, submit the final report.</small></div>
+        <button class="btn btn-sm" type="button" data-email="ahmed.almousa@jic.edu.sa" data-t="continueAs">Continue</button></li>
+      <li><span class="avatar">YA</span><div class="info"><b>Yazeed Mubarak Alqahtani</b><small data-t="descReem">No placement yet. Browse and apply for opportunities.</small></div>
+        <button class="btn btn-sm" type="button" data-email="yazeed.alqahtani@jic.edu.sa" data-t="continueAs">Continue</button></li>
+      <li><span class="avatar">EL</span><div class="info"><b>Eastern Logistics Co.</b><small data-t="descCompany">Post opportunities, review applicants, generate the daily code.</small></div>
+        <button class="btn btn-sm" type="button" data-email="coop@easternlogistics.sa" data-t="continueAs">Continue</button></li>
+      <li><span class="avatar">AR</span><div class="info"><b>Dr. Abdullah Rashed Alrumi</b><small data-t="descSupervisor">Monitor students, approve attendance, review reports.</small></div>
+        <button class="btn btn-sm" type="button" data-email="abdullah.alrumi@jic.edu.sa" data-t="continueAs">Continue</button></li>
+      <li><span class="avatar">CO</span><div class="info"><b>COOP Office</b><small data-t="descAdmin">Approve companies and opportunities, manage users.</small></div>
+        <button class="btn btn-sm" type="button" data-email="coop.office@jic.edu.sa" data-t="continueAs">Continue</button></li>
+    </ul>
+    <p class="small muted" style="margin-top:14px"><a href="install.php" data-t="resetDemo">Reset demo data</a></p>
+  </div>
+</main>
+
+<div id="toast" class="toast" hidden></div>
+<script src="js/main.js"></script>
+<script src="js/public.js"></script>
+<script>startPage(null, renderLogin);</script>
+</body>
+</html>

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title data-t="navDashboard">Dashboard · E-COOP</title>
+<link rel="icon" href="../images/logo.png">
+<link rel="stylesheet" href="../css/style.css">
+<script src="../js/lang.js"></script>
+</head>
+<body>
+<!-- ===== header: logo, menu, notifications, language, account ===== -->
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <a class="brand" href="dashboard.html"><img src="../images/logo.png" alt=""> E-COOP</a>
+    <nav class="nav" aria-label="Main menu">
+      <a href="dashboard.html" class="active" data-t="navDashboard">Dashboard</a>
+      <a href="opportunities.html" data-t="navOpportunities">Opportunities</a>
+      <a href="applications.html" data-t="navApplications">Applications</a>
+      <a href="attendance.html" data-t="navAttendance">Attendance</a>
+      <a href="report.html" data-t="navReport">Final Report</a>
+    </nav>
+    <div class="top-actions">
+      <button class="top-btn" type="button" onclick="toggleNotifications()">&#128276; <span class="txt" data-t="notifications">Notifications</span><span class="count" id="notif-count" hidden>0</span></button>
+      <button class="top-btn" type="button" onclick="switchLanguage()" data-t="language">العربية</button>
+      <a class="top-btn" href="settings.html" title="Settings"><span class="avatar" id="me-avatar"></span><span class="txt" id="me-name"></span></a>
+    </div>
+  </div>
+  <div class="notif-panel" id="notif-panel" hidden>
+    <div class="notif-head"><b data-t="notifications">Notifications</b><button class="btn btn-sm btn-light" type="button" onclick="toggleNotifications()" data-t="close">Close</button></div>
+    <ul class="notif-list" id="notif-list"></ul>
+  </div>
+</header>
+
+<!-- ===== page title ===== -->
+<section class="hero">
+  <div class="wrap hero-in">
+    <div>
+      <p class="eyebrow" id="eyebrow"></p>
+      <h1 id="greeting">Welcome</h1>
+      <p class="lead" id="lead"></p>
+    </div>
+    <div class="glass">
+      <div class="glass-top"><span data-t="yourProgress">Your progress</span><span class="glass-value" id="progress-value">0%</span></div>
+      <div class="glass-bar"><span id="progress-bar" style="width:0%"></span></div>
+      <ol class="steps" id="progress-steps"></ol>
+      <p><b data-t="nextStep">Next step</b>: <span id="next-step"></span></p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== page content ===== -->
+<main class="wrap">
+  <!-- quick links -->
+  <nav class="tiles" aria-label="Quick actions">
+    <a class="tile" href="attendance.html"><span class="ico">&#128197;</span><span data-t="logAttendance">Log Attendance</span></a>
+    <a class="tile" href="report.html"><span class="ico">&#128196;</span><span data-t="navReport">Final Report</span></a>
+    <a class="tile" href="opportunities.html"><span class="ico">&#128188;</span><span data-t="navOpportunities">Opportunities</span></a>
+    <a class="tile" href="applications.html"><span class="ico">&#128203;</span><span data-t="navApplications">Applications</span><span class="num" id="apps-count" hidden></span></a>
+  </nav>
+
+  <div id="alerts" class="section"></div>
+
+  <!-- shown when the student has a placement -->
+  <div id="placed" class="split" hidden>
+    <section>
+      <h2 data-t="yourPlacement">Your placement</h2>
+      <div class="card opp" id="placement-card" style="margin-top:12px"></div>
+      <div class="card" style="margin-top:12px">
+        <ul class="kv">
+          <li><span data-t="supervisor">Supervisor</span><b id="sup-name"></b></li>
+          <li><span data-t="finalReport">Final report</span><span id="report-status"></span></li>
+        </ul>
+      </div>
+    </section>
+    <section>
+      <h2 data-t="activity">Activity</h2>
+      <div class="card" id="activity" style="margin-top:12px"></div>
+    </section>
+  </div>
+
+  <!-- shown when the student has no placement yet -->
+  <div id="not-placed" hidden>
+    <div class="card empty">
+      <b data-t="noPlacementTitle">You don't have a placement yet</b>
+      <p data-t="noPlacementBody">Browse approved opportunities that match your major and apply.</p>
+      <a class="btn" href="opportunities.html" data-t="browseOpps">Browse COOP Opportunities</a>
+    </div>
+    <section class="section" id="my-apps-box">
+      <h2 data-t="myApplications">My Applications</h2>
+      <div style="margin-top:12px">
+  <div class="table-box">
+    <table>
+      <thead><tr><th data-t="opportunity">Opportunity</th><th data-t="company">Company</th><th data-t="appliedOn">Applied</th><th data-t="status">Status</th></tr></thead>
+      <tbody id="apps-body"></tbody>
+    </table>
+  </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<div id="toast" class="toast" hidden></div>
+<script src="../js/main.js"></script>
+<script src="../js/student.js"></script>
+<script>startPage('Student', renderDashboard);</script>
+</body>
+</html>
