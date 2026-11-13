@@ -137,7 +137,7 @@ check('audit log readable text for procedures', any(l['action'].startswith('Acce
 
 reg = U()
 check('student register needs college e-mail (TC-08)', reg.post('auth.php', op='register', kind='Student', name='Test Student', email='t@gmail.com', password='Passw0rd!', major='Computer Science', gpa='4')['code'] == 'email_domain')
-r = reg.post('auth.php', op='register', kind='Student', name='Sara Test', email='sara.test@jic.edu.sa', password='Passw0rd1', phone='0551112223', major='Computer Science', gpa='4.1')
+r = reg.post('auth.php', op='register', kind='Student', name='Sara Test', email='sara.test@jic.edu.sa', password='Passw0rd1', phone='0551112223', major='Computer Science', gpa='3.6')
 check('student registers and is signed in', r['ok'] and r['me'] and any(u['email'] == 'sara.test@jic.edu.sa' for u in r['state']['users']), r.get('error'))
 check('new account can sign in with its password', U('sara.test@jic.edu.sa', 'Passw0rd1').last['ok'])
 check('duplicate e-mail refused', U().post('auth.php', op='register', kind='Student', name='Sara Again', email='sara.test@jic.edu.sa', password='Passw0rd1', major='Computer Science')['code'] == 'email_taken')
@@ -152,19 +152,19 @@ check('export logged', admin.act(type='logExport', report='Institution', format=
 png = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=='
 r = ahmed.act(type='avatar', photo=png); av = [u for u in r['state']['users'] if u['id'] == 'u1'][0].get('avatar')
 check('profile photo saved', r['ok'] and av and ahmed.s.get(BASE + '/' + av).status_code == 200, r.get('error'))
-r = ahmed.act(type='profile', fields={'phone': '0551234000', 'gpa': '4.30', 'cv': 'Ahmed_CV.pdf'}, userFields={'name': 'Ahmed Abdulmohsen Almousa'})
-check('student profile saved', [x for x in r['state']['students'] if x['id'] == 's1'][0]['gpa'] == '4.30', r.get('error'))
+r = ahmed.act(type='profile', fields={'phone': '0551234000', 'gpa': '3.30', 'cv': 'Ahmed_CV.pdf'}, userFields={'name': 'Ahmed Abdulmohsen Almousa'})
+check('student profile saved', [x for x in r['state']['students'] if x['id'] == 's1'][0]['gpa'] == '3.30', r.get('error'))
 check('bad GPA refused (CHECK)', ahmed.act(type='profile', fields={'phone': '', 'gpa': '7', 'cv': ''}, userFields={'name': 'Ahmed'})['code'] == 'validation')
 r = east.act(type='companyProfile', name='Eastern Logistics Co.', city='Dammam', phone='0138001201'); check('company profile saved (UC-07)', r['ok'], r.get('error'))
 # ---------------------------------------------------------------- minimum GPA of an opportunity
-yz = U('yazeed.alqahtani@jic.edu.sa')                                     # GPA 4.40, not placed
+yz = U('yazeed.alqahtani@jic.edu.sa')                                     # GPA 3.52, not placed
 o8 = [o for o in yz.state()['state']['opps'] if o['id'] == 'o8'][0]
-check('opportunity carries its minimum GPA', o8['minGpa'] == '4.50' and [o for o in yz.state()['state']['opps'] if o['id'] == 'o4'][0]['minGpa'] == '')
+check('opportunity carries its minimum GPA', o8['minGpa'] == '3.75' and [o for o in yz.state()['state']['opps'] if o['id'] == 'o4'][0]['minGpa'] == '')
 r = yz.act(type='apply', opp='o8'); check('GPA below the minimum cannot apply', r['code'] == 'gpa_low' and not [x for x in r['state']['apps'] if x['student'] == 's6' and x['opp'] == 'o8'], r)
-r = east.act(type='postOpp', opp={'title': 'Finance Analyst Trainee', 'city': 'Dammam', 'majors': 'Business Administration', 'capacity': 1, 'minGpa': '4.40', 'description': 'Prepare monthly cost reports.'})
+r = east.act(type='postOpp', opp={'title': 'Finance Analyst Trainee', 'city': 'Dammam', 'majors': 'Business Administration', 'capacity': 1, 'minGpa': '3.52', 'description': 'Prepare monthly cost reports.'})
 fin = [o for o in r['state']['opps'] if o['title'] == 'Finance Analyst Trainee']
-check('company posts an opportunity with a minimum GPA', r['ok'] and fin and fin[0]['minGpa'] == '4.40', r.get('error'))
-check('minimum GPA must be 0 to 5', east.act(type='postOpp', opp={'title': 'Bad GPA Trainee', 'city': 'Dammam', 'majors': 'Business Administration', 'capacity': 1, 'minGpa': '6', 'description': 'x'})['code'] == 'validation')
+check('company posts an opportunity with a minimum GPA', r['ok'] and fin and fin[0]['minGpa'] == '3.52', r.get('error'))
+check('minimum GPA must be 0 to 4', east.act(type='postOpp', opp={'title': 'Bad GPA Trainee', 'city': 'Dammam', 'majors': 'Business Administration', 'capacity': 1, 'minGpa': '4.5', 'description': 'x'})['code'] == 'validation')
 admin.act(type='oppDecision', id=fin[0]['id'], status='Open')
 r = yz.act(type='apply', opp=fin[0]['id']); check('GPA equal to the minimum can apply', r['ok'], r.get('error'))
 yz.act(type='profile', fields={'phone': '', 'gpa': '', 'cv': ''}, userFields={'name': 'Yazeed Mubarak Alqahtani'})

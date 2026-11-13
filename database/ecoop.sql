@@ -121,7 +121,7 @@ CREATE TABLE students (
   CONSTRAINT uq_students_user UNIQUE (user_id),
   CONSTRAINT uq_students_university UNIQUE (university_id),
   CONSTRAINT ck_students_role CHECK (role = 'Student'),
-  CONSTRAINT ck_students_gpa  CHECK (gpa IS NULL OR gpa BETWEEN 0 AND 5),
+  CONSTRAINT ck_students_gpa  CHECK (gpa IS NULL OR gpa BETWEEN 0 AND 4),
   CONSTRAINT ck_students_cv   CHECK (cv_file_path IS NULL OR LOWER(cv_file_path) REGEXP '\\.(pdf|docx)$'),
   CONSTRAINT fk_students_user  FOREIGN KEY (user_id, role) REFERENCES users (user_id, role) ON UPDATE RESTRICT ON DELETE RESTRICT,
   CONSTRAINT fk_students_major FOREIGN KEY (major_id) REFERENCES majors (major_id) ON UPDATE CASCADE ON DELETE RESTRICT,
@@ -141,7 +141,7 @@ CREATE TABLE coop_opportunities (
   description          TEXT              NOT NULL,
   city                 VARCHAR(80)       NOT NULL,
   capacity             SMALLINT UNSIGNED NOT NULL,
-  min_gpa              DECIMAL(3,2)      NULL,                        -- minimum GPA to apply (out of 5), NULL = no minimum
+  min_gpa              DECIMAL(3,2)      NULL,                        -- minimum GPA to apply (out of 4), NULL = no minimum
   status               ENUM('Pending Approval','Approved','Rejected','Closed') NOT NULL DEFAULT 'Pending Approval',
   posted_at            DATETIME          NOT NULL DEFAULT CURRENT_TIMESTAMP,
   approved_at          DATETIME          NULL,
@@ -149,7 +149,7 @@ CREATE TABLE coop_opportunities (
   CONSTRAINT pk_coop_opportunities PRIMARY KEY (opportunity_id),
   CONSTRAINT ck_opp_capacity CHECK (capacity > 0),                                                         -- UC-08 1b
   CONSTRAINT ck_opp_title CHECK (CHAR_LENGTH(TRIM(title)) >= 3),
-  CONSTRAINT ck_opp_min_gpa CHECK (min_gpa IS NULL OR min_gpa BETWEEN 0 AND 5),
+  CONSTRAINT ck_opp_min_gpa CHECK (min_gpa IS NULL OR min_gpa BETWEEN 0 AND 4),
   CONSTRAINT ck_opp_approved CHECK (status NOT IN ('Approved','Closed') OR approved_by_admin_id IS NOT NULL), -- BR-07
   CONSTRAINT ck_opp_rejected CHECK (status <> 'Rejected' OR rejection_reason IS NOT NULL),
   CONSTRAINT fk_opp_company FOREIGN KEY (company_id) REFERENCES companies (company_id) ON UPDATE RESTRICT ON DELETE RESTRICT,          -- BR-06
@@ -713,23 +713,23 @@ INSERT INTO companies (company_id, user_id, company_name, cr_number, city, appro
  (3, 11, 'Al-Bahar Industrial Services', '2055003003', 'Jubail', 'Pending Approval', NULL, NULL, DATE_ADD('2026-08-05 10:00', INTERVAL @off DAY)),
  (4, 12, 'Khobar Digital Solutions', '2051004004', 'Khobar', 'Pending Approval', NULL, NULL, DATE_ADD('2026-08-05 10:00', INTERVAL @off DAY));
 INSERT INTO students (student_id, user_id, university_id, major_id, gpa, cv_file_path, cv_uploaded_at, supervisor_id, supervisor_assigned_at) VALUES
- (1, 1, '431900499', 1, 4.21, 'cv/Ahmed_Almousa_CV.pdf', DATE_ADD('2026-08-15 12:00', INTERVAL @off DAY), 1, DATE_ADD('2026-09-01 08:05', INTERVAL @off DAY)),
- (2, 2, '431900446', 1, 4.62, 'cv/Anas_Alamri_CV.pdf', DATE_ADD('2026-08-15 12:00', INTERVAL @off DAY), 1, DATE_ADD('2026-09-01 08:05', INTERVAL @off DAY)),
- (3, 3, '441100723', 1, 3.78, 'cv/Omar_Alghamdi_CV.docx', DATE_ADD('2026-08-15 12:00', INTERVAL @off DAY), 1, DATE_ADD('2026-09-01 08:05', INTERVAL @off DAY)),
- (4, 4, '441100369', 2, 4.05, 'cv/Hamad_Alghubari_CV.pdf', DATE_ADD('2026-08-15 12:00', INTERVAL @off DAY), 1, DATE_ADD('2026-09-01 08:05', INTERVAL @off DAY)),
- (5, 5, '441100555', 3, 3.64, 'cv/Abdullah_CV.pdf', DATE_ADD('2026-08-15 12:00', INTERVAL @off DAY), 2, DATE_ADD('2026-09-01 08:05', INTERVAL @off DAY)),
- (6, 6, '431901674', 1, 4.40, 'cv/Yazeed_Alqahtani_CV.pdf', DATE_ADD('2026-08-15 12:00', INTERVAL @off DAY), NULL, NULL),
- (7, 7, '441100777', 1, 3.92, 'cv/Hind_CV.pdf', DATE_ADD('2026-08-15 12:00', INTERVAL @off DAY), 2, DATE_ADD('2026-09-01 08:05', INTERVAL @off DAY)),
- (8, 8, '441100888', 4, 3.10, NULL, NULL, 2, DATE_ADD('2026-09-01 08:05', INTERVAL @off DAY));
+ (1, 1, '431900499', 1, 3.37, 'cv/Ahmed_Almousa_CV.pdf', DATE_ADD('2026-08-15 12:00', INTERVAL @off DAY), 1, DATE_ADD('2026-09-01 08:05', INTERVAL @off DAY)),
+ (2, 2, '431900446', 1, 3.70, 'cv/Anas_Alamri_CV.pdf', DATE_ADD('2026-08-15 12:00', INTERVAL @off DAY), 1, DATE_ADD('2026-09-01 08:05', INTERVAL @off DAY)),
+ (3, 3, '441100723', 1, 3.02, 'cv/Omar_Alghamdi_CV.docx', DATE_ADD('2026-08-15 12:00', INTERVAL @off DAY), 1, DATE_ADD('2026-09-01 08:05', INTERVAL @off DAY)),
+ (4, 4, '441100369', 2, 3.24, 'cv/Hamad_Alghubari_CV.pdf', DATE_ADD('2026-08-15 12:00', INTERVAL @off DAY), 1, DATE_ADD('2026-09-01 08:05', INTERVAL @off DAY)),
+ (5, 5, '441100555', 3, 2.91, 'cv/Abdullah_CV.pdf', DATE_ADD('2026-08-15 12:00', INTERVAL @off DAY), 2, DATE_ADD('2026-09-01 08:05', INTERVAL @off DAY)),
+ (6, 6, '431901674', 1, 3.52, 'cv/Yazeed_Alqahtani_CV.pdf', DATE_ADD('2026-08-15 12:00', INTERVAL @off DAY), NULL, NULL),
+ (7, 7, '441100777', 1, 3.14, 'cv/Hind_CV.pdf', DATE_ADD('2026-08-15 12:00', INTERVAL @off DAY), 2, DATE_ADD('2026-09-01 08:05', INTERVAL @off DAY)),
+ (8, 8, '441100888', 4, 2.48, NULL, NULL, 2, DATE_ADD('2026-09-01 08:05', INTERVAL @off DAY));
 INSERT INTO coop_opportunities (opportunity_id, company_id, approved_by_admin_id, title, description, city, capacity, min_gpa, status, posted_at, approved_at) VALUES
- (1, 1, 1, 'Process Engineering Trainee', 'Support the operations team with process monitoring, shift logs and daily production reports.', 'Jubail', 4, 3.50, 'Approved', DATE_ADD('2026-08-18 09:00', INTERVAL @off DAY), DATE_ADD('2026-08-18 15:00', INTERVAL @off DAY)),
- (2, 2, 1, 'Supply Chain Analyst Trainee', 'Track inbound shipments, reconcile warehouse stock counts and prepare weekly KPI summaries.', 'Dammam', 3, 3.50, 'Approved', DATE_ADD('2026-08-12 09:00', INTERVAL @off DAY), DATE_ADD('2026-08-12 15:00', INTERVAL @off DAY)),
- (3, 1, 1, 'Maintenance Planning Trainee', 'Schedule preventive maintenance work orders and follow up spare-part requests with stores.', 'Jubail', 3, 3.00, 'Approved', DATE_ADD('2026-09-02 09:00', INTERVAL @off DAY), DATE_ADD('2026-09-02 15:00', INTERVAL @off DAY)),
+ (1, 1, 1, 'Process Engineering Trainee', 'Support the operations team with process monitoring, shift logs and daily production reports.', 'Jubail', 4, 2.75, 'Approved', DATE_ADD('2026-08-18 09:00', INTERVAL @off DAY), DATE_ADD('2026-08-18 15:00', INTERVAL @off DAY)),
+ (2, 2, 1, 'Supply Chain Analyst Trainee', 'Track inbound shipments, reconcile warehouse stock counts and prepare weekly KPI summaries.', 'Dammam', 3, 3.00, 'Approved', DATE_ADD('2026-08-12 09:00', INTERVAL @off DAY), DATE_ADD('2026-08-12 15:00', INTERVAL @off DAY)),
+ (3, 1, 1, 'Maintenance Planning Trainee', 'Schedule preventive maintenance work orders and follow up spare-part requests with stores.', 'Jubail', 3, 2.50, 'Approved', DATE_ADD('2026-09-02 09:00', INTERVAL @off DAY), DATE_ADD('2026-09-02 15:00', INTERVAL @off DAY)),
  (4, 2, 1, 'HR Operations Trainee', 'Help run onboarding, update employee records and prepare attendance reports for payroll.', 'Dammam', 2, NULL, 'Approved', DATE_ADD('2026-09-14 09:00', INTERVAL @off DAY), DATE_ADD('2026-09-14 15:00', INTERVAL @off DAY)),
- (5, 1, NULL, 'Quality Control Lab Trainee', 'Run routine sample tests, record results in the lab system and flag out-of-spec batches.', 'Jubail', 2, 3.75, 'Pending Approval', DATE_ADD('2026-09-27 09:00', INTERVAL @off DAY), NULL),
+ (5, 1, NULL, 'Quality Control Lab Trainee', 'Run routine sample tests, record results in the lab system and flag out-of-spec batches.', 'Jubail', 2, 3.00, 'Pending Approval', DATE_ADD('2026-09-27 09:00', INTERVAL @off DAY), NULL),
  (6, 2, NULL, 'Customs and Trade Compliance Trainee', 'Prepare import documentation, check HS codes and track customs clearance status.', 'Dammam', 1, NULL, 'Pending Approval', DATE_ADD('2026-09-28 09:00', INTERVAL @off DAY), NULL),
- (7, 2, 1, 'Fleet Scheduling Trainee', 'Plan daily delivery routes and monitor driver schedules against service-level targets.', 'Khobar', 2, 3.50, 'Approved', DATE_ADD('2026-09-20 09:00', INTERVAL @off DAY), DATE_ADD('2026-09-20 15:00', INTERVAL @off DAY)),
- (8, 2, 1, 'Procurement Analyst Trainee', 'Compare supplier quotations, prepare purchase orders and report monthly spending to the procurement manager.', 'Dammam', 2, 4.50, 'Approved', DATE_ADD('2026-09-25 09:00', INTERVAL @off DAY), DATE_ADD('2026-09-25 15:00', INTERVAL @off DAY));
+ (7, 2, 1, 'Fleet Scheduling Trainee', 'Plan daily delivery routes and monitor driver schedules against service-level targets.', 'Khobar', 2, 2.75, 'Approved', DATE_ADD('2026-09-20 09:00', INTERVAL @off DAY), DATE_ADD('2026-09-20 15:00', INTERVAL @off DAY)),
+ (8, 2, 1, 'Procurement Analyst Trainee', 'Compare supplier quotations, prepare purchase orders and report monthly spending to the procurement manager.', 'Dammam', 2, 3.75, 'Approved', DATE_ADD('2026-09-25 09:00', INTERVAL @off DAY), DATE_ADD('2026-09-25 15:00', INTERVAL @off DAY));
 INSERT INTO opportunity_majors (opportunity_id, major_id) VALUES (1, 2), (1, 3), (2, 1), (3, 4), (4, 1), (5, 7), (5, 2), (6, 1), (7, 1), (7, 3), (8, 1);
 -- applications go in before placements: the eligibility trigger only lets unplaced students apply
 INSERT INTO applications (application_id, student_id, opportunity_id, status, submitted_at, decided_at, rejection_reason) VALUES

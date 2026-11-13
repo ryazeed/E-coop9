@@ -109,7 +109,7 @@ function submitPosting(e) {
   setText('o-title-err', title.length < 5 ? t('titleRequired') : '');
   setText('o-desc-err', desc.length < 20 ? t('descRequired') : '');
   var gpa = document.getElementById('o-gpa').value.trim();                 // optional
-  var gpaOk = gpa === '' || (!isNaN(gpa) && +gpa >= 0 && +gpa <= 5);
+  var gpaOk = gpa === '' || (!isNaN(gpa) && +gpa >= 0 && +gpa <= 4);
   setText('o-gpa-err', gpaOk ? '' : t('minGpaError'));
   if (title.length < 5 || desc.length < 20 || !gpaOk) return;
   if (!(cap >= 1 && cap <= 20)) { toast(t('capacityError'), true); return; }

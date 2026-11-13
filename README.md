@@ -122,7 +122,7 @@ E-COOP-PHP/
 | NFR-SE-05 5 wrong passwords → 15 min lock | `auth.php` login | `users.failed_login_count`, `lockout_until` |
 | BR-05 company approved before posting | – | trigger `trg_opp_company_approved` |
 | BR-07 apply only to approved opportunities | – | trigger `trg_app_eligibility` |
-| Minimum GPA of an opportunity (set by the company, optional) | `act_postOpp`, `act_apply` | `coop_opportunities.min_gpa`, `CHECK 0–5`, trigger `trg_app_eligibility` |
+| Minimum GPA of an opportunity (set by the company, optional) | `act_postOpp`, `act_apply` | `coop_opportunities.min_gpa`, `CHECK 0–4`, trigger `trg_app_eligibility` |
 | BR-08 one application per opportunity | `act_apply` | `UNIQUE (student_id, opportunity_id)` |
 | UC-10 accept: capacity, placement, withdraw others | `act_appDecision` | procedure `sp_accept_application` |
 | BR-13 one 6-digit code per placement per day | `random_int` (CSPRNG) | procedure `sp_get_or_create_daily_code`, `UNIQUE (placement_id, code_date)` |

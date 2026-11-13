@@ -71,7 +71,7 @@ function register(array $b): void {
         $major = val('SELECT major_id FROM majors WHERE major_name = ?', [(string)($b['major'] ?? '')]);
         if (!$major) fail('Choose your major.', 'validation');
         $gpa = $b['gpa'] ?? '';
-        if ($gpa !== '' && (!is_numeric($gpa) || $gpa < 0 || $gpa > 5)) fail('GPA must be between 0 and 5.', 'validation');
+        if ($gpa !== '' && (!is_numeric($gpa) || $gpa < 0 || $gpa > 4)) fail('GPA must be between 0 and 4.', 'validation');
         $uni = 'REG' . str_pad((string)$uid, 6, '0', STR_PAD_LEFT);       // the college ID is confirmed later by the COOP office
         q("INSERT INTO students (user_id, university_id, major_id, gpa) VALUES (?,?,?,?)", [$uid, $uni, $major, $gpa === '' ? null : $gpa]);
         $adminKey = 'nNewStudent';

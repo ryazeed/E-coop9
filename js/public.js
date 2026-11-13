@@ -109,7 +109,7 @@ function register(e) {
     'r-name-err': v.name.length < 3 ? (k === 'Company' ? t('reCompany') : t('reName')) : '',
     'r-email-err': !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.email) ? t('reEmail') : (k !== 'Company' && !/@jic\.edu\.sa$/.test(v.email) ? t('reCollege') : ''),
     'r-phone-err': !/^05\d{8}$/.test(v.phone) ? t('rePhone') : '',
-    'r-gpa-err': k === 'Student' && (isNaN(parseFloat(v.gpa)) || +v.gpa < 0 || +v.gpa > 5) ? t('reGpa') : '',
+    'r-gpa-err': k === 'Student' && (isNaN(parseFloat(v.gpa)) || +v.gpa < 0 || +v.gpa > 4) ? t('reGpa') : '',
     'r-pass-err': v.pass.length < 8 || !/[A-Za-z]/.test(v.pass) || !/\d/.test(v.pass) ? t('rePass') : '',
     'r-pass2-err': v.pass !== v.pass2 ? t('rePass2') : '',
     'r-agree-err': !document.getElementById('r-agree').checked ? t('reAgree') : ''

@@ -127,7 +127,7 @@ function act_profile(array $a): void {                                 // studen
     $phone = preg_replace('/\s/', '', (string)($f['phone'] ?? ''));
     if ($phone !== '' && !preg_match('/^0\d{8,9}$/', $phone)) fail('Phone must look like 05XXXXXXXX.', 'validation');
     $gpa = $f['gpa'] ?? null;
-    if ($gpa !== null && $gpa !== '' && (!is_numeric($gpa) || $gpa < 0 || $gpa > 5)) fail('GPA must be between 0 and 5.', 'validation');
+    if ($gpa !== null && $gpa !== '' && (!is_numeric($gpa) || $gpa < 0 || $gpa > 4)) fail('GPA must be between 0 and 4.', 'validation');
     $cv = trim((string)($f['cv'] ?? ''));
     $cvPath = $cv !== '' && preg_match('/\.(pdf|docx)$/i', $cv) ? 'cv/' . basename($cv) : null;
     $name = text_in($uf, 'name', 150);
@@ -147,7 +147,7 @@ function act_postOpp(array $a): void {                                 // UC-08
     $cap = (int)($o['capacity'] ?? 0);
     if ($cap < 1 || $cap > 100) fail('Capacity must be between 1 and 100.', 'validation');
     $minGpa = trim((string)($o['minGpa'] ?? ''));                      // optional: empty = no minimum
-    if ($minGpa !== '' && (!is_numeric($minGpa) || $minGpa < 0 || $minGpa > 5)) fail('Minimum GPA must be between 0 and 5.', 'validation');
+    if ($minGpa !== '' && (!is_numeric($minGpa) || $minGpa < 0 || $minGpa > 4)) fail('Minimum GPA must be between 0 and 4.', 'validation');
     $minGpa = $minGpa === '' ? null : round((float)$minGpa, 2);
     $majors = is_array($o['majors'] ?? null) ? $o['majors'] : array_filter(array_map('trim', explode(',', (string)($o['majors'] ?? ''))));
     if (!$majors) fail('Choose at least one major.', 'validation');

@@ -100,7 +100,7 @@ const PAGES = {
   await p.click('#upload-btn'); await p.waitForTimeout(1500);
   ok('student uploads the final report', /Ahmed_Final_Report\.pdf/.test(await p.textContent('#report-file')));
   await p.goto(BASE + '/student/settings.html'); await p.waitForTimeout(700);
-  await p.fill('#p-gpa', '4.40'); await p.click('#profile-form button[type=submit]'); await p.waitForTimeout(900);
+  await p.fill('#p-gpa', '3.40'); await p.click('#profile-form button[type=submit]'); await p.waitForTimeout(900);
   ok('student saves the profile', /Profile saved/i.test(await p.textContent('#toast')));
   await p.click('text=Sign Out'); await p.waitForTimeout(900);
   ok('sign out returns to sign in', p.url().endsWith('/login.html'));
@@ -162,7 +162,7 @@ const PAGES = {
   await login(p, 'yazeed.alqahtani@jic.edu.sa');
   await p.goto(BASE + '/student/opportunities.html'); await p.waitForTimeout(700);
   const low = p.locator('#opp-list .card', { hasText: 'Procurement Analyst Trainee' });
-  ok('opportunity card shows the minimum GPA', /Minimum GPA: 4\.50/.test(await low.innerText()), await low.innerText());
+  ok('opportunity card shows the minimum GPA', /Minimum GPA: 3\.75/.test(await low.innerText()), await low.innerText());
   ok('student below the minimum GPA cannot apply', await low.locator('button').isDisabled() && /below the minimum/.test(await low.innerText()));
   await low.screenshot({ path: SHOTS + '/10_min_gpa_card.png' });
   await p.screenshot({ path: SHOTS + '/10_opportunities.png' });
@@ -171,8 +171,8 @@ const PAGES = {
   await login(p, 'coop@easternlogistics.sa');
   await p.goto(BASE + '/company/postings.html?new=1'); await p.waitForTimeout(700);
   await p.fill('#o-title', 'Inventory Control Trainee'); await p.fill('#o-desc', 'Count stock every week and report differences to the warehouse manager.');
-  await p.fill('#o-gpa', '7'); await p.click('#post-form button[type=submit]'); await p.waitForTimeout(300);
-  ok('minimum GPA above 5 is refused', /between 0 and 5/.test(await p.textContent('#o-gpa-err')));
+  await p.fill('#o-gpa', '4.5'); await p.click('#post-form button[type=submit]'); await p.waitForTimeout(300);
+  ok('minimum GPA above 4 is refused', /between 0 and 4/.test(await p.textContent('#o-gpa-err')));
   await p.fill('#o-gpa', '3.8'); await p.screenshot({ path: SHOTS + '/11_post_form_gpa.png' });
   await p.click('#post-form button[type=submit]'); await p.waitForTimeout(900);
   const posted = p.locator('#postings-body tr', { hasText: 'Inventory Control Trainee' });
@@ -228,7 +228,7 @@ const PAGES = {
   ({ ctx, p } = await open());
   await p.goto(BASE + '/register.html'); await p.waitForTimeout(600);
   await p.fill('#r-name', 'Noura Test Student'); await p.fill('#r-email', 'noura@gmail.com'); await p.fill('#r-phone', '0551239876');
-  await p.fill('#r-gpa', '4.2'); await p.fill('#r-pass', 'Passw0rd1'); await p.fill('#r-pass2', 'Passw0rd1'); await p.check('#r-agree');
+  await p.fill('#r-gpa', '3.6'); await p.fill('#r-pass', 'Passw0rd1'); await p.fill('#r-pass2', 'Passw0rd1'); await p.check('#r-agree');
   await p.click('#r-submit'); await p.waitForTimeout(500);
   ok('student e-mail must be @jic.edu.sa', /jic\.edu\.sa/.test(await p.textContent('#r-email-err')));
   await p.fill('#r-email', 'noura.test@jic.edu.sa'); await p.click('#r-submit'); await p.waitForTimeout(1500);

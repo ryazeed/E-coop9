@@ -81,7 +81,7 @@ function setupStudentProfile() {
     var ok = true;
     setText('p-name-err', name.length < 3 ? t('enterFullName') : ''); if (name.length < 3) ok = false;
     setText('p-phone-err', !/^05\d{8}$/.test(phone) ? t('phoneError') : ''); if (!/^05\d{8}$/.test(phone)) ok = false;
-    setText('p-gpa-err', isNaN(g) || g < 0 || g > 5 ? t('gpaError') : ''); if (isNaN(g) || g < 0 || g > 5) ok = false;
+    setText('p-gpa-err', isNaN(g) || g < 0 || g > 4 ? t('gpaError') : ''); if (isNaN(g) || g < 0 || g > 4) ok = false;
     if (cvFile && !/\.(pdf|docx)$/i.test(cvFile.name)) { toast(t('fileTypeError'), true); ok = false; }
     if (!ok) return;
     act({ type: 'profile', fields: { phone: phone, gpa: gpa, cv: cvFile ? cvFile.name : st.cv }, userFields: { name: name } }, t('profileSaved'), function () {

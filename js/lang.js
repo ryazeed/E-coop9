@@ -58,7 +58,7 @@ var I18N = {
     revisionNote: 'Your supervisor requested a revision. Upload an updated file.',
     reportApproved: 'Your final report was approved.', evaluations: 'Evaluations', noEvals: 'No evaluations yet. They appear here when your company and supervisor submit them.',
     profileTitle: 'Profile', fullName: 'Full name', email: 'University email', phone: 'Phone', gpa: 'GPA', cv: 'CV', saveProfile: 'Save Profile', profileSaved: 'Profile saved.',
-    phoneError: 'Enter a Saudi mobile number starting with 05, 10 digits.', gpaError: 'GPA must be between 0 and 5.',
+    phoneError: 'Enter a Saudi mobile number starting with 05, 10 digits.', gpaError: 'GPA must be between 0 and 4.',
     /* company */
     companyOverview: 'Company Overview', activeTrainees: 'Active trainees', openPostings: 'Open postings', newApplicants: 'New applicants', todaysCheckins: 'Today’s check-ins',
     postOpp: 'Post Opportunity', postTitle: 'Post a New Opportunity', oppTitle: 'Opportunity title', description: 'Description', capacity: 'Capacity',
@@ -133,7 +133,7 @@ var I18N = {
     revisionNote: 'طلب مشرفك تعديل التقرير. ارفع نسخة محدّثة.',
     reportApproved: 'تم اعتماد تقريرك النهائي.', evaluations: 'التقييمات', noEvals: 'لا توجد تقييمات بعد. تظهر هنا عندما ترفعها الجهة والمشرف.',
     profileTitle: 'الملف الشخصي', fullName: 'الاسم الكامل', email: 'البريد الجامعي', phone: 'الجوال', gpa: 'المعدل', cv: 'السيرة الذاتية', saveProfile: 'حفظ الملف', profileSaved: 'تم حفظ الملف.',
-    phoneError: 'أدخل رقم جوال سعودي يبدأ بـ 05 من 10 أرقام.', gpaError: 'يجب أن يكون المعدل بين 0 و5.',
+    phoneError: 'أدخل رقم جوال سعودي يبدأ بـ 05 من 10 أرقام.', gpaError: 'يجب أن يكون المعدل بين 0 و4.',
     companyOverview: 'نظرة عامة على الجهة', activeTrainees: 'المتدربون النشطون', openPostings: 'الفرص المفتوحة', newApplicants: 'متقدمون جدد', todaysCheckins: 'حضور اليوم',
     postOpp: 'نشر فرصة', postTitle: 'نشر فرصة جديدة', oppTitle: 'مسمى الفرصة', description: 'الوصف', capacity: 'عدد المقاعد',
     majorReq: 'التخصصات المطلوبة', postHelp: 'تبقى الفرص الجديدة مخفية عن الطلاب حتى يعتمدها المسؤول.', postedToast: 'تم نشر الفرصة وهي بانتظار اعتماد المسؤول.',
@@ -422,11 +422,11 @@ Object.assign(LANDING.en, {
   createAccount: 'Create Account', newHere: 'New to E-COOP?', haveAccount: 'Already have an account?', signInLink: 'Sign in',
   rTitle: 'Create your E\u2011COOP account', rLead: 'Students, academic supervisors and companies can register with any email. Companies post training opportunities after the COOP office approves them.',
   rType: 'I am a', rStudent: 'Student', rCompany: 'Company', rFullName: 'Full name', rCompanyName: 'Company name', rEmail: 'Email', rCollegeEmail: 'College email',
-  rPhone: 'Mobile number', rMajor: 'Major', rGpa: 'GPA (out of 5)', rCity: 'City', rPass: 'Password', rPass2: 'Confirm password',
+  rPhone: 'Mobile number', rMajor: 'Major', rGpa: 'GPA (out of 4)', rCity: 'City', rPass: 'Password', rPass2: 'Confirm password',
   rPassHelp: 'At least 8 characters, with a letter and a number.', rAgree: 'I agree to the cooperative training policy and the PDPL personal data terms.', rSubmit: 'Create Account',
   rCompanyNote: 'Company accounts can sign in right away. You can post opportunities once the COOP office approves your company.',
   reName: 'Enter your full name.', reCompany: 'Enter the company name.', reCollege: 'Use your college email ending in @jic.edu.sa.', reEmail: 'Enter a valid email, for example name@example.com.',
-  reTaken: 'An account already uses this email. Sign in instead.', rePhone: 'Enter a Saudi mobile number starting with 05, 10 digits.', reGpa: 'GPA must be between 0 and 5.',
+  reTaken: 'An account already uses this email. Sign in instead.', rePhone: 'Enter a Saudi mobile number starting with 05, 10 digits.', reGpa: 'GPA must be between 0 and 4.',
   rePass: 'Use at least 8 characters, with a letter and a number.', rePass2: 'The passwords don\u2019t match.', reAgree: 'Agree to the terms to create your account.',
   rePassWrong: 'The password is incorrect. Try again.', rSupervisor: 'Supervisor', rAdmin: 'Admin', rCode: 'Admin access code', rCodeHelp: '', reCode: 'The access code is incorrect. Ask the COOP office for the current code.', rAdmNote: 'Admin accounts can approve companies, manage users and see every record. Only COOP office staff should create one, using the office\u2019s access code.', rDept: 'Department', rCityPh: 'Choose a city', rCityHelp: 'All Saudi cities, grouped by region.', reCity: 'Choose the city where the company is based.', rSupNote: 'Supervisor accounts are for academic staff. The COOP office assigns students to you after you join.', rDemoNote: 'In this demo, new accounts are saved only in this browser.'
 });
@@ -434,11 +434,11 @@ Object.assign(LANDING.ar, {
   createAccount: 'إنشاء حساب', newHere: 'جديد في E-COOP؟', haveAccount: 'لديك حساب؟', signInLink: 'سجّل الدخول',
   rTitle: 'أنشئ حسابك في E-COOP', rLead: 'يمكن للطلاب والمشرفين الأكاديميين والجهات التسجيل بأي بريد إلكتروني. وتنشر الجهات فرص التدريب بعد اعتمادها من مكتب التدريب التعاوني.',
   rType: 'نوع الحساب', rStudent: 'طالب', rCompany: 'جهة تدريب', rFullName: 'الاسم الكامل', rCompanyName: 'اسم الجهة', rEmail: 'البريد الإلكتروني', rCollegeEmail: 'البريد الجامعي',
-  rPhone: 'رقم الجوال', rMajor: 'التخصص', rGpa: 'المعدل (من 5)', rCity: 'المدينة', rPass: 'كلمة المرور', rPass2: 'تأكيد كلمة المرور',
+  rPhone: 'رقم الجوال', rMajor: 'التخصص', rGpa: 'المعدل (من 4)', rCity: 'المدينة', rPass: 'كلمة المرور', rPass2: 'تأكيد كلمة المرور',
   rPassHelp: '8 أحرف على الأقل، تتضمن حرفًا ورقمًا.', rAgree: 'أوافق على سياسة التدريب التعاوني وشروط نظام حماية البيانات الشخصية.', rSubmit: 'إنشاء الحساب',
   rCompanyNote: 'يمكن لحساب الجهة تسجيل الدخول فورًا، ونشر الفرص بعد اعتماد مكتب التدريب للجهة.',
   reName: 'أدخل اسمك الكامل.', reCompany: 'أدخل اسم الجهة.', reCollege: 'استخدم بريدك الجامعي المنتهي بـ @jic.edu.sa.', reEmail: 'أدخل بريدًا صحيحًا، مثل name@example.com.',
-  reTaken: 'هذا البريد مستخدم في حساب آخر. سجّل الدخول بدلًا من ذلك.', rePhone: 'أدخل رقم جوال سعودي يبدأ بـ 05 من 10 أرقام.', reGpa: 'يجب أن يكون المعدل بين 0 و5.',
+  reTaken: 'هذا البريد مستخدم في حساب آخر. سجّل الدخول بدلًا من ذلك.', rePhone: 'أدخل رقم جوال سعودي يبدأ بـ 05 من 10 أرقام.', reGpa: 'يجب أن يكون المعدل بين 0 و4.',
   rePass: 'استخدم 8 أحرف على الأقل تتضمن حرفًا ورقمًا.', rePass2: 'كلمتا المرور غير متطابقتين.', reAgree: 'وافق على الشروط لإنشاء حسابك.',
   rePassWrong: 'كلمة المرور غير صحيحة. حاول مرة أخرى.', rSupervisor: 'مشرف أكاديمي', rAdmin: 'مسؤول', rCode: 'رمز صلاحية المسؤول', rCodeHelp: '', reCode: 'رمز الصلاحية غير صحيح. اطلب الرمز الحالي من مكتب التدريب التعاوني.', rAdmNote: 'يستطيع المسؤول اعتماد الجهات وإدارة المستخدمين والاطلاع على جميع السجلات. يجب أن يُنشئ هذا الحساب موظفو مكتب التدريب فقط باستخدام رمز الصلاحية.', rDept: 'القسم', rCityPh: 'اختر المدينة', rCityHelp: 'جميع مدن المملكة مرتبة حسب المنطقة.', reCity: 'اختر المدينة التي يقع فيها مقر الجهة.', rSupNote: 'حسابات المشرفين مخصصة لأعضاء هيئة التدريس، ويعيّن مكتب التدريب الطلاب لك بعد انضمامك.', rDemoNote: 'في هذه النسخة التجريبية تُحفظ الحسابات الجديدة في هذا المتصفح فقط.'
 });
@@ -454,7 +454,7 @@ Object.assign(I18N.en, {
   demoPasswordHint: 'Password for every demo account:', codeLocked: '5 wrong codes: check-in is blocked for 10 minutes.',
   fDemoHint: 'Demo: the sample accounts use the password Coop@2026.', nRaw: '{m}', Withdrawn: 'Withdrawn',
   /* minimum GPA of an opportunity */
-  minGpa: 'Minimum GPA', minGpaHelp: 'Out of 5. Leave empty if any GPA can apply.', minGpaError: 'Minimum GPA must be a number between 0 and 5.',
+  minGpa: 'Minimum GPA', minGpaHelp: 'Out of 4. Leave empty if any GPA can apply.', minGpaError: 'Minimum GPA must be a number between 0 and 4.',
   noMinGpa: 'No minimum', gpaLow: 'Your GPA is below the minimum', gpaMissing: 'Add your GPA in Settings to apply', yourGpa: 'Your GPA',
   /* chat */
   navChat: 'Chat', chatTitle: 'Chat', chatLead: 'Message anyone on E-COOP by their email or phone number.', newMessage: 'New Message',
@@ -474,7 +474,7 @@ Object.assign(I18N.ar, {
   demoPasswordHint: 'كلمة المرور لكل الحسابات التجريبية:', codeLocked: '٥ رموز خاطئة: تم إيقاف تسجيل الحضور لمدة ١٠ دقائق.',
   fDemoHint: 'تجريبي: كلمة مرور الحسابات التجريبية هي Coop@2026.', nRaw: '{m}', Withdrawn: 'مسحوب',
   /* الحد الأدنى للمعدل */
-  minGpa: 'الحد الأدنى للمعدل', minGpaHelp: 'من 5. اتركه فارغًا إذا كان التقديم متاحًا لأي معدل.', minGpaError: 'الحد الأدنى للمعدل يجب أن يكون رقمًا بين 0 و 5.',
+  minGpa: 'الحد الأدنى للمعدل', minGpaHelp: 'من 4. اتركه فارغًا إذا كان التقديم متاحًا لأي معدل.', minGpaError: 'الحد الأدنى للمعدل يجب أن يكون رقمًا بين 0 و 4.',
   noMinGpa: 'بدون حد أدنى', gpaLow: 'معدلك أقل من الحد الأدنى', gpaMissing: 'أضف معدلك من الإعدادات للتقديم', yourGpa: 'معدلك',
   /* المحادثات */
   navChat: 'المحادثات', chatTitle: 'المحادثات', chatLead: 'راسل أي مستخدم في E-COOP ببريده الإلكتروني أو رقم جواله.', newMessage: 'رسالة جديدة',
