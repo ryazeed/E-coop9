@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title data-t="chatTitle">Chat · E-COOP</title>
+<link rel="icon" href="../images/icon.png">
+<link rel="stylesheet" href="../css/style.css">
+<script src="../js/lang.js"></script>
+</head>
+<body>
+<!-- ===== header: logo, menu, notifications, language, account ===== -->
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <a class="brand" href="overview.html"><img src="../images/logo.png" alt="E-COOP logo" width="800" height="452"><span>E-COOP</span></a>
+    <nav class="nav" aria-label="Main menu">
+      <a href="overview.html"><span data-t="navOverview">Overview</span></a>
+      <a href="postings.html"><span data-t="navPostings">Postings</span></a>
+      <a href="applicants.html"><span data-t="navApplicants">Applicants</span></a>
+      <a href="dailycode.html"><span data-t="navDailyCode">Daily Code</span></a>
+      <a href="trainees.html"><span data-t="navTrainees">Trainees</span></a>
+      <a href="chat.html" class="active"><span data-t="navChat">Chat</span><span class="nav-count" id="chat-count" hidden>0</span></a>
+    </nav>
+    <div class="top-actions">
+      <button class="top-btn" type="button" onclick="toggleNotifications()">&#128276; <span class="txt" data-t="notifications">Notifications</span><span class="count" id="notif-count" hidden>0</span></button>
+      <button class="top-btn" type="button" onclick="switchLanguage()" data-t="language">العربية</button>
+      <a class="top-btn" href="settings.html" title="Settings"><span class="avatar" id="me-avatar"></span><span class="txt" id="me-name"></span></a>
+    </div>
+  </div>
+  <div class="notif-panel" id="notif-panel" hidden>
+    <div class="notif-head"><b data-t="notifications">Notifications</b><button class="btn btn-sm btn-light" type="button" onclick="toggleNotifications()" data-t="close">Close</button></div>
+    <ul class="notif-list" id="notif-list"></ul>
+  </div>
+</header>
+
+<!-- ===== page title ===== -->
+<section class="hero">
+  <div class="wrap hero-in">
+    <div>
+      <h1 data-t="chatTitle">Chat</h1>
+      <p class="lead" id="lead"></p>
+    </div>
+    <button class="hero-btn" type="button" onclick="showNewChat(true)">&#9993; <span data-t="newMessage">New Message</span></button>
+  </div>
+</section>
+
+<!-- ===== page content ===== -->
+<main class="wrap">
+  <!-- start a new conversation: find a user by e-mail or phone, or pick a suggested contact -->
+  <div class="card" id="new-chat" hidden>
+    <form class="form" id="lookup-form" novalidate>
+      <h2 data-t="newMessage">New Message</h2>
+      <div>
+        <label for="lookup" data-t="searchContact">Email or phone number</label>
+        <div class="row">
+          <input type="text" id="lookup" placeholder="name@jic.edu.sa · 05XXXXXXXX" style="flex:1;min-width:200px">
+          <button class="btn" type="submit" data-t="findAccount">Find Account</button>
+          <button class="btn btn-light" type="button" onclick="showNewChat(false)" data-t="cancel">Cancel</button>
+        </div>
+        <span class="help" data-t="searchHelp">Enter the full email or mobile number of any E-COOP user to message them.</span>
+        <span class="error" id="lookup-error"></span>
+      </div>
+      <div>
+        <label data-t="suggested">Suggested contacts</label>
+        <ul class="contacts" id="contacts"></ul>
+      </div>
+    </form>
+  </div>
+
+  <!-- conversations on one side, the open conversation on the other -->
+  <div class="chat" id="chat">
+    <aside class="chat-list" id="chat-list" aria-label="Conversations"></aside>
+
+    <section class="chat-thread" id="chat-thread">
+      <div class="chat-none" id="chat-none"><span class="ico">&#128172;</span><p data-t="pickChat">Choose a conversation to read it.</p></div>
+
+      <div id="chat-open" hidden>
+        <header class="thread-head">
+          <button class="btn btn-sm btn-light thread-back" type="button" onclick="openChat(null)" data-t="backToList">All conversations</button>
+          <span id="thread-avatar"></span>
+          <div><b id="thread-name"></b><small class="muted" id="thread-sub"></small></div>
+        </header>
+        <ol class="msgs" id="msgs"></ol>
+        <form class="composer" id="composer" autocomplete="off">
+          <label for="msg-input" class="sr-only" data-t="typeMessage">Type a message</label>
+          <input type="text" id="msg-input" maxlength="1000" data-t-ph="typeMessage" placeholder="Type a message">
+          <button class="btn" type="submit" data-t="send">Send</button>
+        </form>
+      </div>
+    </section>
+  </div>
+  <p class="small muted" style="margin-top:10px" data-t="chatPrivacy">Messages are visible only to the people in this conversation.</p>
+</main>
+
+<div id="toast" class="toast" hidden></div>
+<script src="../js/main.js"></script>
+<script src="../js/company.js"></script>
+<script src="../js/chat.js"></script>
+<script>startPage('Company', renderChat);</script>
+</body>
+</html>

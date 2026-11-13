@@ -1,6 +1,6 @@
 -- =====================================================================================
 --  E-COOP - Cooperative Training Management System (MIS 451, Jubail Industrial College)
---  ONE-FILE DATABASE SETUP: schema (19 tables, triggers, procedures, views) + demo data.
+--  ONE-FILE DATABASE SETUP: schema (22 tables, triggers, procedures, views) + demo data.
 --  Import this file in phpMyAdmin (Import tab) or run it with:  mysql -u root < ecoop.sql
 --  It DROPS and re-creates the database "ecoop". Works on XAMPP (MariaDB 10.4+) and MySQL 8.
 -- =====================================================================================
@@ -141,6 +141,7 @@ CREATE TABLE coop_opportunities (
   description          TEXT              NOT NULL,
   city                 VARCHAR(80)       NOT NULL,
   capacity             SMALLINT UNSIGNED NOT NULL,
+  min_gpa              DECIMAL(3,2)      NULL,                        -- minimum GPA to apply (out of 5), NULL = no minimum
   status               ENUM('Pending Approval','Approved','Rejected','Closed') NOT NULL DEFAULT 'Pending Approval',
   posted_at            DATETIME          NOT NULL DEFAULT CURRENT_TIMESTAMP,
   approved_at          DATETIME          NULL,
@@ -148,6 +149,7 @@ CREATE TABLE coop_opportunities (
   CONSTRAINT pk_coop_opportunities PRIMARY KEY (opportunity_id),
   CONSTRAINT ck_opp_capacity CHECK (capacity > 0),                                                         -- UC-08 1b
   CONSTRAINT ck_opp_title CHECK (CHAR_LENGTH(TRIM(title)) >= 3),
+  CONSTRAINT ck_opp_min_gpa CHECK (min_gpa IS NULL OR min_gpa BETWEEN 0 AND 5),
   CONSTRAINT ck_opp_approved CHECK (status NOT IN ('Approved','Closed') OR approved_by_admin_id IS NOT NULL), -- BR-07
   CONSTRAINT ck_opp_rejected CHECK (status <> 'Rejected' OR rejection_reason IS NOT NULL),
   CONSTRAINT fk_opp_company FOREIGN KEY (company_id) REFERENCES companies (company_id) ON UPDATE RESTRICT ON DELETE RESTRICT,          -- BR-06
@@ -382,6 +384,43 @@ CREATE TABLE contact_messages (                                        -- landin
   CONSTRAINT fk_contact_admin FOREIGN KEY (handled_by) REFERENCES admins (admin_id) ON UPDATE RESTRICT ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
+-- -------------------------------------------------------------------------------------
+-- 14. Chat: conversations, their members and the messages
+-- -------------------------------------------------------------------------------------
+CREATE TABLE conversations (
+  conversation_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  kind            ENUM('Direct','Group') NOT NULL DEFAULT 'Direct',    -- Direct = two users, Group = a placement group
+  title           VARCHAR(150) NULL,                                   -- only groups have a title
+  created_by      INT UNSIGNED NULL,
+  created_at      DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT pk_conversations PRIMARY KEY (conversation_id),
+  CONSTRAINT ck_conv_title CHECK (kind = 'Direct' OR title IS NOT NULL),
+  CONSTRAINT fk_conv_creator FOREIGN KEY (created_by) REFERENCES users (user_id) ON UPDATE RESTRICT ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE conversation_members (                                    -- M:N between conversations and users
+  conversation_id INT UNSIGNED NOT NULL,
+  user_id         INT UNSIGNED NOT NULL,
+  joined_at       DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  last_read_at    DATETIME     NULL,                                   -- messages after this time are unread
+  CONSTRAINT pk_conversation_members PRIMARY KEY (conversation_id, user_id),
+  CONSTRAINT fk_cm_conversation FOREIGN KEY (conversation_id) REFERENCES conversations (conversation_id) ON UPDATE RESTRICT ON DELETE CASCADE,
+  CONSTRAINT fk_cm_user FOREIGN KEY (user_id) REFERENCES users (user_id) ON UPDATE RESTRICT ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE messages (
+  message_id      INT UNSIGNED  NOT NULL AUTO_INCREMENT,
+  conversation_id INT UNSIGNED  NOT NULL,
+  sender_id       INT UNSIGNED  NOT NULL,
+  body            VARCHAR(1000) NOT NULL,
+  sent_at         DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT pk_messages PRIMARY KEY (message_id),
+  CONSTRAINT ck_msg_body CHECK (CHAR_LENGTH(TRIM(body)) >= 1),
+  -- the sender must be a member of the conversation
+  CONSTRAINT fk_msg_member FOREIGN KEY (conversation_id, sender_id) REFERENCES conversation_members (conversation_id, user_id) ON UPDATE RESTRICT ON DELETE CASCADE,
+  INDEX ix_msg_conversation (conversation_id, sent_at)
+) ENGINE=InnoDB;
+
 -- =====================================================================================
 --  TRIGGERS - rules that span more than one row/table
 -- =====================================================================================
@@ -413,14 +452,20 @@ BEGIN
   END IF;
 END$$
 
--- UC-03: apply only to approved opportunities, and only without an active placement
+-- UC-03: apply only to approved opportunities, only without an active placement, and only with the required GPA
 CREATE TRIGGER trg_app_eligibility BEFORE INSERT ON applications FOR EACH ROW
 BEGIN
+  DECLARE v_min DECIMAL(3,2); DECLARE v_gpa DECIMAL(3,2);
   IF (SELECT status FROM coop_opportunities WHERE opportunity_id = NEW.opportunity_id) <> 'Approved' THEN
     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'BR-07: students can only apply to approved opportunities';
   END IF;
   IF (SELECT placement_id FROM students WHERE student_id = NEW.student_id) IS NOT NULL THEN
     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'UC-03: a student with an active placement cannot apply';
+  END IF;
+  SELECT min_gpa INTO v_min FROM coop_opportunities WHERE opportunity_id = NEW.opportunity_id;
+  SELECT gpa INTO v_gpa FROM students WHERE student_id = NEW.student_id;
+  IF v_min IS NOT NULL AND (v_gpa IS NULL OR v_gpa < v_min) THEN
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'The student GPA is below the minimum GPA of this opportunity';
   END IF;
 END$$
 
@@ -676,15 +721,16 @@ INSERT INTO students (student_id, user_id, university_id, major_id, gpa, cv_file
  (6, 6, '431901674', 1, 4.40, 'cv/Yazeed_Alqahtani_CV.pdf', DATE_ADD('2026-08-15 12:00', INTERVAL @off DAY), NULL, NULL),
  (7, 7, '441100777', 1, 3.92, 'cv/Hind_CV.pdf', DATE_ADD('2026-08-15 12:00', INTERVAL @off DAY), 2, DATE_ADD('2026-09-01 08:05', INTERVAL @off DAY)),
  (8, 8, '441100888', 4, 3.10, NULL, NULL, 2, DATE_ADD('2026-09-01 08:05', INTERVAL @off DAY));
-INSERT INTO coop_opportunities (opportunity_id, company_id, approved_by_admin_id, title, description, city, capacity, status, posted_at, approved_at) VALUES
- (1, 1, 1, 'Process Engineering Trainee', 'Support the operations team with process monitoring, shift logs and daily production reports.', 'Jubail', 4, 'Approved', DATE_ADD('2026-08-18 09:00', INTERVAL @off DAY), DATE_ADD('2026-08-18 15:00', INTERVAL @off DAY)),
- (2, 2, 1, 'Supply Chain Analyst Trainee', 'Track inbound shipments, reconcile warehouse stock counts and prepare weekly KPI summaries.', 'Dammam', 3, 'Approved', DATE_ADD('2026-08-12 09:00', INTERVAL @off DAY), DATE_ADD('2026-08-12 15:00', INTERVAL @off DAY)),
- (3, 1, 1, 'Maintenance Planning Trainee', 'Schedule preventive maintenance work orders and follow up spare-part requests with stores.', 'Jubail', 3, 'Approved', DATE_ADD('2026-09-02 09:00', INTERVAL @off DAY), DATE_ADD('2026-09-02 15:00', INTERVAL @off DAY)),
- (4, 2, 1, 'HR Operations Trainee', 'Help run onboarding, update employee records and prepare attendance reports for payroll.', 'Dammam', 2, 'Approved', DATE_ADD('2026-09-14 09:00', INTERVAL @off DAY), DATE_ADD('2026-09-14 15:00', INTERVAL @off DAY)),
- (5, 1, NULL, 'Quality Control Lab Trainee', 'Run routine sample tests, record results in the lab system and flag out-of-spec batches.', 'Jubail', 2, 'Pending Approval', DATE_ADD('2026-09-27 09:00', INTERVAL @off DAY), NULL),
- (6, 2, NULL, 'Customs and Trade Compliance Trainee', 'Prepare import documentation, check HS codes and track customs clearance status.', 'Dammam', 1, 'Pending Approval', DATE_ADD('2026-09-28 09:00', INTERVAL @off DAY), NULL),
- (7, 2, 1, 'Fleet Scheduling Trainee', 'Plan daily delivery routes and monitor driver schedules against service-level targets.', 'Khobar', 2, 'Approved', DATE_ADD('2026-09-20 09:00', INTERVAL @off DAY), DATE_ADD('2026-09-20 15:00', INTERVAL @off DAY));
-INSERT INTO opportunity_majors (opportunity_id, major_id) VALUES (1, 2), (1, 3), (2, 1), (3, 4), (4, 1), (5, 7), (5, 2), (6, 1), (7, 1), (7, 3);
+INSERT INTO coop_opportunities (opportunity_id, company_id, approved_by_admin_id, title, description, city, capacity, min_gpa, status, posted_at, approved_at) VALUES
+ (1, 1, 1, 'Process Engineering Trainee', 'Support the operations team with process monitoring, shift logs and daily production reports.', 'Jubail', 4, 3.50, 'Approved', DATE_ADD('2026-08-18 09:00', INTERVAL @off DAY), DATE_ADD('2026-08-18 15:00', INTERVAL @off DAY)),
+ (2, 2, 1, 'Supply Chain Analyst Trainee', 'Track inbound shipments, reconcile warehouse stock counts and prepare weekly KPI summaries.', 'Dammam', 3, 3.50, 'Approved', DATE_ADD('2026-08-12 09:00', INTERVAL @off DAY), DATE_ADD('2026-08-12 15:00', INTERVAL @off DAY)),
+ (3, 1, 1, 'Maintenance Planning Trainee', 'Schedule preventive maintenance work orders and follow up spare-part requests with stores.', 'Jubail', 3, 3.00, 'Approved', DATE_ADD('2026-09-02 09:00', INTERVAL @off DAY), DATE_ADD('2026-09-02 15:00', INTERVAL @off DAY)),
+ (4, 2, 1, 'HR Operations Trainee', 'Help run onboarding, update employee records and prepare attendance reports for payroll.', 'Dammam', 2, NULL, 'Approved', DATE_ADD('2026-09-14 09:00', INTERVAL @off DAY), DATE_ADD('2026-09-14 15:00', INTERVAL @off DAY)),
+ (5, 1, NULL, 'Quality Control Lab Trainee', 'Run routine sample tests, record results in the lab system and flag out-of-spec batches.', 'Jubail', 2, 3.75, 'Pending Approval', DATE_ADD('2026-09-27 09:00', INTERVAL @off DAY), NULL),
+ (6, 2, NULL, 'Customs and Trade Compliance Trainee', 'Prepare import documentation, check HS codes and track customs clearance status.', 'Dammam', 1, NULL, 'Pending Approval', DATE_ADD('2026-09-28 09:00', INTERVAL @off DAY), NULL),
+ (7, 2, 1, 'Fleet Scheduling Trainee', 'Plan daily delivery routes and monitor driver schedules against service-level targets.', 'Khobar', 2, 3.50, 'Approved', DATE_ADD('2026-09-20 09:00', INTERVAL @off DAY), DATE_ADD('2026-09-20 15:00', INTERVAL @off DAY)),
+ (8, 2, 1, 'Procurement Analyst Trainee', 'Compare supplier quotations, prepare purchase orders and report monthly spending to the procurement manager.', 'Dammam', 2, 4.50, 'Approved', DATE_ADD('2026-09-25 09:00', INTERVAL @off DAY), DATE_ADD('2026-09-25 15:00', INTERVAL @off DAY));
+INSERT INTO opportunity_majors (opportunity_id, major_id) VALUES (1, 2), (1, 3), (2, 1), (3, 4), (4, 1), (5, 7), (5, 2), (6, 1), (7, 1), (7, 3), (8, 1);
 -- applications go in before placements: the eligibility trigger only lets unplaced students apply
 INSERT INTO applications (application_id, student_id, opportunity_id, status, submitted_at, decided_at, rejection_reason) VALUES
  (1, 1, 2, 'Accepted', DATE_ADD('2026-08-20 10:00', INTERVAL @off DAY), DATE_ADD('2026-08-24 11:00', INTERVAL @off DAY), NULL),
@@ -855,5 +901,43 @@ INSERT INTO audit_logs (log_id, user_id, action, created_at) VALUES
  (3, 15, 'Assigned Abdullah Rashed Alrumi to Ahmed Abdulmohsen Almousa', DATE_ADD('2026-09-01 08:05', INTERVAL @off DAY)),
  (4, 15, 'Suspended account Turki Al-Anazi', DATE_ADD('2026-09-18 13:22', INTERVAL @off DAY)),
  (5, 9, 'Generated daily code for Supply Chain Analyst Trainee', DATE_ADD('2026-09-30 07:30', INTERVAL @off DAY));
+-- chat: one placement group and five direct conversations; messages after last_read_at show as unread
+INSERT INTO conversations (conversation_id, kind, title, created_by, created_at) VALUES
+ (1, 'Group', 'Supply Chain Analyst Trainee · Eastern Logistics', 9, DATE_ADD('2026-09-07 08:00', INTERVAL @off DAY)),
+ (2, 'Direct', NULL, 13, DATE_ADD('2026-09-07 08:00', INTERVAL @off DAY)),
+ (3, 'Direct', NULL, 13, DATE_ADD('2026-09-07 08:00', INTERVAL @off DAY)),
+ (4, 'Direct', NULL, 6, DATE_ADD('2026-09-07 08:00', INTERVAL @off DAY)),
+ (5, 'Direct', NULL, 2, DATE_ADD('2026-09-07 08:00', INTERVAL @off DAY)),
+ (6, 'Direct', NULL, 9, DATE_ADD('2026-09-07 08:00', INTERVAL @off DAY));
+INSERT INTO conversation_members (conversation_id, user_id, joined_at, last_read_at) VALUES
+ (1, 9, DATE_ADD('2026-09-07 08:00', INTERVAL @off DAY), DATE_ADD('2026-09-29 12:00', INTERVAL @off DAY)),
+ (1, 1, DATE_ADD('2026-09-07 08:00', INTERVAL @off DAY), DATE_ADD('2026-09-29 12:00', INTERVAL @off DAY)),
+ (1, 2, DATE_ADD('2026-09-07 08:00', INTERVAL @off DAY), DATE_ADD('2026-09-29 12:00', INTERVAL @off DAY)),
+ (1, 3, DATE_ADD('2026-09-07 08:00', INTERVAL @off DAY), DATE_ADD('2026-09-29 12:00', INTERVAL @off DAY)),
+ (1, 13, DATE_ADD('2026-09-07 08:00', INTERVAL @off DAY), DATE_ADD('2026-09-29 12:00', INTERVAL @off DAY)),
+ (2, 1, DATE_ADD('2026-09-07 08:00', INTERVAL @off DAY), DATE_ADD('2026-09-29 12:00', INTERVAL @off DAY)),
+ (2, 13, DATE_ADD('2026-09-07 08:00', INTERVAL @off DAY), DATE_ADD('2026-09-29 12:00', INTERVAL @off DAY)),
+ (3, 9, DATE_ADD('2026-09-07 08:00', INTERVAL @off DAY), DATE_ADD('2026-09-29 12:00', INTERVAL @off DAY)),
+ (3, 13, DATE_ADD('2026-09-07 08:00', INTERVAL @off DAY), DATE_ADD('2026-09-29 12:00', INTERVAL @off DAY)),
+ (4, 6, DATE_ADD('2026-09-07 08:00', INTERVAL @off DAY), DATE_ADD('2026-09-29 12:00', INTERVAL @off DAY)),
+ (4, 15, DATE_ADD('2026-09-07 08:00', INTERVAL @off DAY), DATE_ADD('2026-09-29 12:00', INTERVAL @off DAY)),
+ (5, 2, DATE_ADD('2026-09-07 08:00', INTERVAL @off DAY), DATE_ADD('2026-09-29 12:00', INTERVAL @off DAY)),
+ (5, 13, DATE_ADD('2026-09-07 08:00', INTERVAL @off DAY), DATE_ADD('2026-09-29 12:00', INTERVAL @off DAY)),
+ (6, 1, DATE_ADD('2026-09-07 08:00', INTERVAL @off DAY), DATE_ADD('2026-09-29 12:00', INTERVAL @off DAY)),
+ (6, 9, DATE_ADD('2026-09-07 08:00', INTERVAL @off DAY), DATE_ADD('2026-09-29 12:00', INTERVAL @off DAY));
+INSERT INTO messages (conversation_id, sender_id, body, sent_at) VALUES
+ (1, 9, 'Good morning all. Today’s attendance code is on the screen next to reception.', DATE_ADD('2026-09-30 07:31', INTERVAL @off DAY)),
+ (1, 2, 'Thank you, checked in.', DATE_ADD('2026-09-30 07:47', INTERVAL @off DAY)),
+ (1, 9, 'Reminder: the weekly KPI review moves to Thursday at 10:00 in meeting room 2.', DATE_ADD('2026-09-30 08:05', INTERVAL @off DAY)),
+ (1, 13, 'I will join the Thursday review for the first 30 minutes to meet the team.', DATE_ADD('2026-09-30 08:20', INTERVAL @off DAY)),
+ (2, 13, 'Ahmed, please share an outline of your final report by 8 October so I can comment early.', DATE_ADD('2026-09-28 10:02', INTERVAL @off DAY)),
+ (2, 1, 'Sure, Mr. Abdullah. Should the report follow the college template or the company one?', DATE_ADD('2026-09-28 10:15', INTERVAL @off DAY)),
+ (2, 13, 'Use the college template, and add the company KPIs as an appendix.', DATE_ADD('2026-09-28 10:21', INTERVAL @off DAY)),
+ (3, 13, 'Could I schedule a site visit for my three trainees next week?', DATE_ADD('2026-09-27 12:40', INTERVAL @off DAY)),
+ (3, 9, 'Tuesday 6 October at 11:00 works for us. Please bring your college ID for the gate.', DATE_ADD('2026-09-27 13:05', INTERVAL @off DAY)),
+ (4, 6, 'When will new opportunities for Business Administration open?', DATE_ADD('2026-09-29 09:30', INTERVAL @off DAY)),
+ (4, 15, 'Two new postings are waiting for approval this week. You will get a notification when they go live.', DATE_ADD('2026-09-29 11:12', INTERVAL @off DAY)),
+ (5, 2, 'I uploaded my final report. Please let me know if anything needs changes.', DATE_ADD('2026-09-28 16:22', INTERVAL @off DAY)),
+ (6, 9, 'Ahmed, please bring the stock count sheets from warehouse B tomorrow morning.', DATE_ADD('2026-09-29 15:10', INTERVAL @off DAY));
 INSERT INTO contact_messages (full_name, email, topic, message, created_at) VALUES
  ('Faisal Al-Dossary', 'faisal@example.com', 'Company', 'We would like to offer COOP seats for logistics students next term.', DATE_ADD('2026-09-26 11:30', INTERVAL @off DAY));

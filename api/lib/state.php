@@ -1,9 +1,10 @@
 <?php
 /*
  * Builds the data the interface works with, in the same shape as the front end's demo data
- * (users, students, companies, opps, apps, placements, codes, attendance, reports, evals, audit, notifs, prefs).
+ * (users, students, companies, opps, apps, placements, codes, attendance, reports, evals, audit, notifs, prefs, chats, msgs).
  * Database ids get the interface prefixes: user 12 -> 'u12', student 3 -> 's3', ...
- * Private data is never sent: no password hashes, and students never receive daily codes.
+ * Private data is never sent: no password hashes, students never receive daily codes,
+ * and chat messages go only to the members of the conversation.
  */
 declare(strict_types=1);
 
@@ -18,7 +19,7 @@ function build_state(PDO $db, ?array $me): array {
     $role = $me['role'] ?? null;
 
     $s = ['users' => [], 'students' => [], 'companies' => [], 'opps' => [], 'apps' => [], 'placements' => [], 'codes' => [],
-          'attendance' => [], 'reports' => [], 'evals' => [], 'audit' => [], 'notifs' => [], 'prefs' => new stdClass(), 'seq' => 100000];
+          'attendance' => [], 'reports' => [], 'evals' => [], 'audit' => [], 'notifs' => [], 'prefs' => new stdClass(), 'chats' => [], 'msgs' => [], 'seq' => 100000];
 
     foreach (all("SELECT u.user_id, u.full_name, u.email, u.phone, u.role, u.account_status, u.avatar_path, u.updated_at,
                          s.student_id, c.company_id, sp.supervisor_id, sp.department, a.admin_id
@@ -51,7 +52,8 @@ function build_state(PDO $db, ?array $me): array {
                                FROM opportunity_majors om JOIN majors m ON m.major_id = om.major_id WHERE om.opportunity_id = o.opportunity_id) AS majors
                   FROM coop_opportunities o ORDER BY o.opportunity_id DESC") as $r) {
         $s['opps'][] = ['id' => 'o' . $r['opportunity_id'], 'company' => 'c' . $r['company_id'], 'title' => $r['title'], 'city' => $r['city'],
-            'majors' => $r['majors'] ?? '', 'capacity' => (int)$r['capacity'], 'status' => $oppStatus[$r['status']],
+            'majors' => $r['majors'] ?? '', 'capacity' => (int)$r['capacity'],
+            'minGpa' => $r['min_gpa'] === null ? '' : number_format((float)$r['min_gpa'], 2, '.', ''), 'status' => $oppStatus[$r['status']],
             'posted' => d10($r['posted_at']), 'description' => $r['description']];
     }
 
@@ -122,6 +124,20 @@ function build_state(PDO $db, ?array $me): array {
             $prefs['u' . $me['user_id'] . ':' . $r['pref_key']] = (bool)$r['is_enabled'];
         }
         $s['prefs'] = (object)$prefs;
+
+        // chat: only the conversations I am a member of, with their members and messages
+        $mine = all('SELECT c.conversation_id, c.kind, c.title, me.last_read_at FROM conversations c
+                     JOIN conversation_members me ON me.conversation_id = c.conversation_id AND me.user_id = ? ORDER BY c.conversation_id', [$me['user_id']]);
+        foreach ($mine as $r) {
+            $members = all('SELECT user_id FROM conversation_members WHERE conversation_id = ? ORDER BY user_id', [$r['conversation_id']]);
+            $s['chats'][] = ['id' => 'ch' . $r['conversation_id'], 'kind' => strtolower($r['kind']), 'title' => $r['title'],
+                'members' => array_map(fn($m) => 'u' . $m['user_id'], $members), 'lastRead' => $r['last_read_at'] ? str_replace(' ', 'T', $r['last_read_at']) : ''];
+        }
+        foreach (all('SELECT m.* FROM messages m JOIN conversation_members me ON me.conversation_id = m.conversation_id AND me.user_id = ?
+                      ORDER BY m.sent_at, m.message_id', [$me['user_id']]) as $r) {
+            $s['msgs'][] = ['id' => 'm' . $r['message_id'], 'chat' => 'ch' . $r['conversation_id'], 'from' => 'u' . $r['sender_id'],
+                'text' => $r['body'], 'ts' => str_replace(' ', 'T', $r['sent_at'])];
+        }
     }
     return $s;
 }

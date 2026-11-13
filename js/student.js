@@ -114,12 +114,17 @@ function renderOpportunities() {
     var mine = S.apps.filter(function (a) { return a.student === st.id && a.opp === o.id; })[0];
     var pl = S.placements.filter(function (p) { return p.opp === o.id; })[0];
     var taken = pl ? S.students.filter(function (x) { return x.placement === pl.id; }).length : 0;
+    // minimum GPA: the student cannot apply with a lower GPA (PHP and the database check this again)
+    var gpaNote = !o.minGpa ? '' : st.gpa === '' ? t('gpaMissing') : +st.gpa < +o.minGpa ? t('gpaLow') + ' (' + t('yourGpa') + ' ' + st.gpa + ')' : '';
+    var blocked = st.placement || taken >= o.capacity || gpaNote;
     var button = mine
       ? '<a class="btn btn-sm btn-light" href="applications.html">' + t('viewApplication') + '</a>'
-      : '<button class="btn btn-sm" type="button" onclick="applyTo(\'' + o.id + '\')"' + (st.placement || taken >= o.capacity ? ' disabled' : '') + '>' + (taken >= o.capacity ? t('full') : t('apply')) + '</button>';
+      : '<button class="btn btn-sm" type="button" onclick="applyTo(\'' + o.id + '\')"' + (blocked ? ' disabled' : '') + '>' + (taken >= o.capacity ? t('full') : t('apply')) + '</button>';
     return '<div class="card opp">' + (mine ? badge(mine.status) : '') +
       '<h3>' + esc(o.title) + '</h3><p class="company">' + esc(companyName(o.company)) + '</p><p>' + esc(o.description) + '</p>' +
-      '<div class="meta"><span>&#128205; ' + esc(cityLabel(o.city, LANG)) + '</span><span>&#127891; ' + esc(o.majors) + '</span><span>&#128186; ' + t('seats') + ': ' + (o.capacity - taken) + ' / ' + o.capacity + '</span></div>' +
+      '<div class="meta"><span>&#128205; ' + esc(cityLabel(o.city, LANG)) + '</span><span>&#127891; ' + esc(o.majors) + '</span><span>&#128186; ' + t('seats') + ': ' + (o.capacity - taken) + ' / ' + o.capacity + '</span>' +
+      '<span>&#127919; ' + t('minGpa') + ': <b>' + (o.minGpa || t('noMinGpa')) + '</b></span></div>' +
+      (gpaNote && !mine ? '<p class="gpa-note">' + esc(gpaNote) + '</p>' : '') +
       '<div class="foot"><span class="muted small">' + t('postedOn') + ' ' + fmtDate(o.posted) + '</span>' + button + '</div></div>';
   }).join(''));
 }

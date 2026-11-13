@@ -97,8 +97,8 @@ function renderPostings() {
 
   setHTML('postings-body', tableRows(k.opps.map(function (o) {
     var apps = S.apps.filter(function (a) { return a.opp === o.id; }).length;
-    return [esc(o.title), esc(cityLabel(o.city, LANG)), o.capacity, apps, fmtDate(o.posted), badge(o.status)];
-  }), 6));
+    return [esc(o.title), esc(cityLabel(o.city, LANG)), o.capacity, o.minGpa || '—', apps, fmtDate(o.posted), badge(o.status)];
+  }), 7));
 }
 
 function submitPosting(e) {
@@ -108,9 +108,12 @@ function submitPosting(e) {
   var cap = +document.getElementById('o-cap').value;
   setText('o-title-err', title.length < 5 ? t('titleRequired') : '');
   setText('o-desc-err', desc.length < 20 ? t('descRequired') : '');
-  if (title.length < 5 || desc.length < 20) return;
+  var gpa = document.getElementById('o-gpa').value.trim();                 // optional
+  var gpaOk = gpa === '' || (!isNaN(gpa) && +gpa >= 0 && +gpa <= 5);
+  setText('o-gpa-err', gpaOk ? '' : t('minGpaError'));
+  if (title.length < 5 || desc.length < 20 || !gpaOk) return;
   if (!(cap >= 1 && cap <= 20)) { toast(t('capacityError'), true); return; }
-  act({ type: 'postOpp', opp: { title: title, city: document.getElementById('o-city').value, majors: document.getElementById('o-major').value, capacity: cap, description: desc } },
+  act({ type: 'postOpp', opp: { title: title, city: document.getElementById('o-city').value, majors: document.getElementById('o-major').value, capacity: cap, minGpa: gpa, description: desc } },
     t('postedToast'), renderPostings).then(function (res) {
     if (res.ok) { document.getElementById('post-form').reset(); document.getElementById('o-city').value = find(S.companies, ME.ref).city; showPostForm(false); }
   });

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title data-t="traineesTitle">Trainees · E-COOP</title>
-<link rel="icon" href="../images/logo.png">
+<link rel="icon" href="../images/icon.png">
 <link rel="stylesheet" href="../css/style.css">
 <script src="../js/lang.js"></script>
 </head>
@@ -12,13 +12,14 @@
 <!-- ===== header: logo, menu, notifications, language, account ===== -->
 <header class="topbar">
   <div class="wrap topbar-in">
-    <a class="brand" href="overview.html"><img src="../images/logo.png" alt=""> E-COOP</a>
+    <a class="brand" href="overview.html"><img src="../images/logo.png" alt="E-COOP logo" width="800" height="452"><span>E-COOP</span></a>
     <nav class="nav" aria-label="Main menu">
-      <a href="overview.html" data-t="navOverview">Overview</a>
-      <a href="postings.html" data-t="navPostings">Postings</a>
-      <a href="applicants.html" data-t="navApplicants">Applicants</a>
-      <a href="dailycode.html" data-t="navDailyCode">Daily Code</a>
-      <a href="trainees.html" class="active" data-t="navTrainees">Trainees</a>
+      <a href="overview.html"><span data-t="navOverview">Overview</span></a>
+      <a href="postings.html"><span data-t="navPostings">Postings</span></a>
+      <a href="applicants.html"><span data-t="navApplicants">Applicants</span></a>
+      <a href="dailycode.html"><span data-t="navDailyCode">Daily Code</span></a>
+      <a href="trainees.html" class="active"><span data-t="navTrainees">Trainees</span></a>
+      <a href="chat.html"><span data-t="navChat">Chat</span><span class="nav-count" id="chat-count" hidden>0</span></a>
     </nav>
     <div class="top-actions">
       <button class="top-btn" type="button" onclick="toggleNotifications()">&#128276; <span class="txt" data-t="notifications">Notifications</span><span class="count" id="notif-count" hidden>0</span></button>

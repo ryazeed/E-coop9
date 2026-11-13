@@ -2,7 +2,7 @@
    E-COOP - shared JavaScript for every page
    - talks to the PHP back end (api/state.php, api/action.php, api/auth.php)
    - English / Arabic text, dark theme, header, notifications, toast
-   - small helpers used by the role files (student.js, company.js, ...)
+   - small helpers used by the role files (student.js, company.js, chat.js, ...)
    ===================================================================== */
 
 /* folder of the site, so pages inside student/, company/ ... can reach api/ */
@@ -104,6 +104,8 @@ function fillHeader() {
   var c = document.getElementById('notif-count');
   c.textContent = unread;
   c.hidden = unread === 0;
+  var chats = unreadChats(), cc = document.getElementById('chat-count');      // unread chat messages next to "Chat" in the menu
+  if (cc) { cc.textContent = chats; cc.hidden = chats === 0; }
   var list = document.getElementById('notif-list');
   list.innerHTML = S.notifs.length ? S.notifs.slice(0, 20).map(function (n) {
     var args = Object.assign({}, n.args);
@@ -117,6 +119,14 @@ function toggleNotifications() {
   var panel = document.getElementById('notif-panel');
   panel.hidden = !panel.hidden;
   if (panel.hidden && S.notifs.some(function (n) { return !n.read; })) act({ type: 'readNotifs' });   // mark as read when closed
+}
+
+/* ---------- chat: unread messages (used by the header on every page) ---------- */
+function chatUnread(ch) {
+  return S.msgs.filter(function (m) { return m.chat === ch.id && m.from !== ME.id && m.ts > ch.lastRead; }).length;
+}
+function unreadChats() {
+  return S.chats.reduce(function (sum, ch) { return sum + chatUnread(ch); }, 0);
 }
 
 /* ---------- toast message ---------- */

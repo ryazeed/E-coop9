@@ -8,7 +8,7 @@ A complete web system for managing cooperative training (COOP): students apply t
 |---|---|
 | Front end | HTML pages (one file per screen) + CSS + small JavaScript files — no frameworks |
 | Back end | PHP 8 (PDO, sessions, `password_hash`) — REST-style JSON API in `api/` |
-| Database | MySQL / MariaDB — 19 tables, 30 foreign keys, CHECK rules, 12 triggers, 2 stored procedures, 4 views |
+| Database | MySQL / MariaDB — 22 tables, 34 foreign keys, CHECK rules, 12 triggers, 2 stored procedures, 4 views |
 
 ---
 
@@ -79,17 +79,18 @@ E-COOP-PHP/
 ├── index.html              home page (features, how it works, roles, contact form)
 ├── login.html              sign in + demo accounts
 ├── register.html           create an account (student, supervisor, company)
-├── student/                dashboard, opportunities, applications, attendance, report, settings (.html)
-├── company/                overview, postings, applicants, dailycode, trainees, settings (.html)
-├── supervisor/             students, attendance, reports, evaluations, academic, settings (.html)
-├── admin/                  analytics, approvals, users, assign, audit, reports, settings (.html)
+├── student/                dashboard, opportunities, applications, attendance, report, chat, settings (.html)
+├── company/                overview, postings, applicants, dailycode, trainees, chat, settings (.html)
+├── supervisor/             students, attendance, reports, evaluations, academic, chat, settings (.html)
+├── admin/                  analytics, approvals, users, assign, audit, reports, chat, settings (.html)
 ├── css/style.css           all styles (light/dark theme, Arabic right-to-left, phone sizes)
-├── images/logo.png
+├── images/                 logo.png (the E-COOP logo), icon.png (browser tab icon)
 ├── js/
 │   ├── lang.js             English + Arabic text, Saudi cities
 │   ├── main.js             shared: talks to the API, header, notifications, helpers
 │   ├── public.js           home, sign in, register
 │   ├── student.js  company.js  supervisor.js  admin.js   one file per role
+│   ├── chat.js             chat page: conversations, messages, new message
 │   ├── reports.js          report tables, CSV export, print
 │   └── settings.js         profile, photo, notification settings, language, theme
 ├── api/                    PHP back end (JSON)
@@ -105,7 +106,7 @@ E-COOP-PHP/
 ├── database/ecoop.sql      schema + rules + demo data (one file)
 ├── storage/                uploaded files (not public)
 ├── docs/ERD.png, ERD.pdf   the numbered ERD
-└── tests/                  api_test.py (86 API checks), ui_test.js (browser test of every page)
+└── tests/                  api_test.py (109 API checks), ui_test.js (browser test of every page)
 ```
 
 ### How a request works
@@ -121,6 +122,7 @@ E-COOP-PHP/
 | NFR-SE-05 5 wrong passwords → 15 min lock | `auth.php` login | `users.failed_login_count`, `lockout_until` |
 | BR-05 company approved before posting | – | trigger `trg_opp_company_approved` |
 | BR-07 apply only to approved opportunities | – | trigger `trg_app_eligibility` |
+| Minimum GPA of an opportunity (set by the company, optional) | `act_postOpp`, `act_apply` | `coop_opportunities.min_gpa`, `CHECK 0–5`, trigger `trg_app_eligibility` |
 | BR-08 one application per opportunity | `act_apply` | `UNIQUE (student_id, opportunity_id)` |
 | UC-10 accept: capacity, placement, withdraw others | `act_appDecision` | procedure `sp_accept_application` |
 | BR-13 one 6-digit code per placement per day | `random_int` (CSPRNG) | procedure `sp_get_or_create_daily_code`, `UNIQUE (placement_id, code_date)` |
@@ -132,12 +134,14 @@ E-COOP-PHP/
 | BR-18 one final report per student | `act_submitReport` | `UNIQUE (student_id)` |
 | BR-19 one company + one academic evaluation | `act_submitEval` | `UNIQUE (student_id, placement_id, evaluator_type)` |
 | UC-16 academic evaluation after completion | – | trigger `trg_eval_academic_precondition` |
+| Chat: only members read and send | `build_state`, `my_conversation()` | FK `messages (conversation_id, sender_id)` → `conversation_members` |
+| Chat: message 1–1000 characters | `act_sendMsg` | `VARCHAR(1000)`, `CHECK ck_msg_body` |
 | BR-04 audit log cannot be edited | `audit()` on every action | triggers `trg_audit_no_update`, `trg_audit_no_delete` |
 
 ### Tests
 With the server running on port 8000:
 ```
-python tests/api_test.py http://localhost:8000     # 86 checks: every action, permissions and database rules
+python tests/api_test.py http://localhost:8000     # 109 checks: every action, permissions and database rules
 node tests/ui_test.js http://localhost:8000         # browser test of every page (needs: npm i playwright)
 ```
 The tests reset the demo database first.

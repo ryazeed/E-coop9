@@ -452,14 +452,40 @@ Object.assign(I18N.en, {
   enterFullName: 'Enter your full name.', cpName: 'Company name', cpNameError: 'Enter the company name.',
   cpPhoneError: 'Phone must start with 0 and have 9 or 10 digits.', cpSaved: 'Company profile saved.',
   demoPasswordHint: 'Password for every demo account:', codeLocked: '5 wrong codes: check-in is blocked for 10 minutes.',
-  fDemoHint: 'Demo: the sample accounts use the password Coop@2026.', nRaw: '{m}', Withdrawn: 'Withdrawn'
+  fDemoHint: 'Demo: the sample accounts use the password Coop@2026.', nRaw: '{m}', Withdrawn: 'Withdrawn',
+  /* minimum GPA of an opportunity */
+  minGpa: 'Minimum GPA', minGpaHelp: 'Out of 5. Leave empty if any GPA can apply.', minGpaError: 'Minimum GPA must be a number between 0 and 5.',
+  noMinGpa: 'No minimum', gpaLow: 'Your GPA is below the minimum', gpaMissing: 'Add your GPA in Settings to apply', yourGpa: 'Your GPA',
+  /* chat */
+  navChat: 'Chat', chatTitle: 'Chat', chatLead: 'Message anyone on E-COOP by their email or phone number.', newMessage: 'New Message',
+  typeMessage: 'Type a message', send: 'Send', noChats: 'No conversations yet. Start one with New Message.', pickChat: 'Choose a conversation to read it.',
+  backToList: 'All conversations', members: 'members', you: 'You', noContacts: 'No one to message yet.', groupChat: 'Placement group',
+  unreadN: '{n} unread', chatPrivacy: 'Messages are visible only to the people in this conversation.', noMessagesYet: 'No messages yet. Write the first one.',
+  searchContact: 'Email or phone number', searchHelp: 'Enter the full email or mobile number of any E-COOP user to message them.',
+  noMatch: 'No E-COOP account uses this email or phone number. Check it and try again.',
+  invalidLookup: 'Enter a full email (name@domain.sa) or a Saudi number such as 05XXXXXXXX.',
+  cannotSelf: 'That is your own account. Enter someone else’s email or number.', suspendedContact: 'This account is suspended and can’t receive messages.',
+  findAccount: 'Find Account', suggested: 'Suggested contacts', startChat: 'Message'
 });
 Object.assign(I18N.ar, {
   trainingPlaced: 'متدربون', openSeats: 'المقاعد المفتوحة', codeCol: 'الرمز', accountsWord: 'حسابًا', entriesWord: 'سجل',
   enterFullName: 'أدخل اسمك الكامل.', cpName: 'اسم الجهة', cpNameError: 'أدخل اسم الجهة.',
   cpPhoneError: 'يجب أن يبدأ الرقم بـ 0 ويتكون من 9 أو 10 أرقام.', cpSaved: 'تم حفظ ملف الجهة.',
   demoPasswordHint: 'كلمة المرور لكل الحسابات التجريبية:', codeLocked: '٥ رموز خاطئة: تم إيقاف تسجيل الحضور لمدة ١٠ دقائق.',
-  fDemoHint: 'تجريبي: كلمة مرور الحسابات التجريبية هي Coop@2026.', nRaw: '{m}', Withdrawn: 'مسحوب'
+  fDemoHint: 'تجريبي: كلمة مرور الحسابات التجريبية هي Coop@2026.', nRaw: '{m}', Withdrawn: 'مسحوب',
+  /* الحد الأدنى للمعدل */
+  minGpa: 'الحد الأدنى للمعدل', minGpaHelp: 'من 5. اتركه فارغًا إذا كان التقديم متاحًا لأي معدل.', minGpaError: 'الحد الأدنى للمعدل يجب أن يكون رقمًا بين 0 و 5.',
+  noMinGpa: 'بدون حد أدنى', gpaLow: 'معدلك أقل من الحد الأدنى', gpaMissing: 'أضف معدلك من الإعدادات للتقديم', yourGpa: 'معدلك',
+  /* المحادثات */
+  navChat: 'المحادثات', chatTitle: 'المحادثات', chatLead: 'راسل أي مستخدم في E-COOP ببريده الإلكتروني أو رقم جواله.', newMessage: 'رسالة جديدة',
+  typeMessage: 'اكتب رسالة', send: 'إرسال', noChats: 'لا توجد محادثات بعد. ابدأ محادثة من رسالة جديدة.', pickChat: 'اختر محادثة لقراءتها.',
+  backToList: 'كل المحادثات', members: 'أعضاء', you: 'أنت', noContacts: 'لا يوجد من تراسله بعد.', groupChat: 'مجموعة التدريب',
+  unreadN: '{n} غير مقروءة', chatPrivacy: 'الرسائل ظاهرة فقط للمشاركين في هذه المحادثة.', noMessagesYet: 'لا توجد رسائل بعد. اكتب أول رسالة.',
+  searchContact: 'البريد الإلكتروني أو رقم الجوال', searchHelp: 'أدخل البريد الكامل أو رقم جوال أي مستخدم في E-COOP لمراسلته.',
+  noMatch: 'لا يوجد حساب في E-COOP بهذا البريد أو الرقم. تحقق منه وحاول مرة أخرى.',
+  invalidLookup: 'أدخل بريدًا كاملًا (name@domain.sa) أو رقمًا سعوديًا مثل 05XXXXXXXX.',
+  cannotSelf: 'هذا حسابك. أدخل بريد أو رقم شخص آخر.', suspendedContact: 'هذا الحساب موقوف ولا يمكنه استقبال الرسائل.',
+  findAccount: 'بحث عن الحساب', suggested: 'جهات مقترحة', startChat: 'مراسلة'
 });
 Object.assign(STATUS_AR, { Withdrawn: 'مسحوب', Closed: 'مغلقة' });
 

@@ -8,10 +8,10 @@ const results = [], errors = [];
 function ok(name, cond, info) { results.push(!!cond); console.log((cond ? 'PASS ' : 'FAIL ') + name + (cond ? '' : '  -> ' + String(info || '').slice(0, 300))); }
 
 const PAGES = {
-  student: ['dashboard', 'opportunities', 'applications', 'attendance', 'report', 'settings'],
-  company: ['overview', 'postings', 'applicants', 'dailycode', 'trainees', 'settings'],
-  supervisor: ['students', 'attendance', 'reports', 'evaluations', 'academic', 'settings'],
-  admin: ['analytics', 'approvals', 'users', 'assign', 'audit', 'reports', 'settings']
+  student: ['dashboard', 'opportunities', 'applications', 'attendance', 'report', 'chat', 'settings'],
+  company: ['overview', 'postings', 'applicants', 'dailycode', 'trainees', 'chat', 'settings'],
+  supervisor: ['students', 'attendance', 'reports', 'evaluations', 'academic', 'chat', 'settings'],
+  admin: ['analytics', 'approvals', 'users', 'assign', 'audit', 'reports', 'chat', 'settings']
 };
 
 (async () => {
@@ -155,6 +155,73 @@ const PAGES = {
   await p.goto(BASE + '/admin/audit.html'); await p.waitForTimeout(700);
   ok('audit log shows the actions', /Assigned/.test(await p.textContent('#audit-feed')));
   await p.screenshot({ path: SHOTS + '/08_admin_audit_ar.png' });
+  await ctx.close();
+
+  // ---------- minimum GPA: company sets it, student with a lower GPA cannot apply
+  ({ ctx, p } = await open());
+  await login(p, 'yazeed.alqahtani@jic.edu.sa');
+  await p.goto(BASE + '/student/opportunities.html'); await p.waitForTimeout(700);
+  const low = p.locator('#opp-list .card', { hasText: 'Procurement Analyst Trainee' });
+  ok('opportunity card shows the minimum GPA', /Minimum GPA: 4\.50/.test(await low.innerText()), await low.innerText());
+  ok('student below the minimum GPA cannot apply', await low.locator('button').isDisabled() && /below the minimum/.test(await low.innerText()));
+  await low.screenshot({ path: SHOTS + '/10_min_gpa_card.png' });
+  await p.screenshot({ path: SHOTS + '/10_opportunities.png' });
+  await ctx.close();
+  ({ ctx, p } = await open());
+  await login(p, 'coop@easternlogistics.sa');
+  await p.goto(BASE + '/company/postings.html?new=1'); await p.waitForTimeout(700);
+  await p.fill('#o-title', 'Inventory Control Trainee'); await p.fill('#o-desc', 'Count stock every week and report differences to the warehouse manager.');
+  await p.fill('#o-gpa', '7'); await p.click('#post-form button[type=submit]'); await p.waitForTimeout(300);
+  ok('minimum GPA above 5 is refused', /between 0 and 5/.test(await p.textContent('#o-gpa-err')));
+  await p.fill('#o-gpa', '3.8'); await p.screenshot({ path: SHOTS + '/11_post_form_gpa.png' });
+  await p.click('#post-form button[type=submit]'); await p.waitForTimeout(900);
+  const posted = p.locator('#postings-body tr', { hasText: 'Inventory Control Trainee' });
+  ok('company posts an opportunity with a minimum GPA', /3\.80/.test(await posted.innerText()), await posted.innerText().catch(() => 'no row'));
+  await ctx.close();
+
+  // ---------- chat: student writes to the supervisor, the supervisor sees it and answers
+  ({ ctx, p } = await open());
+  await login(p, 'ahmed.almousa@jic.edu.sa');
+  ok('menu shows unread chat messages', (await p.textContent('#chat-count')).trim() === '5', await p.textContent('#chat-count'));
+  await p.goto(BASE + '/student/chat.html'); await p.waitForTimeout(700);
+  ok('chat lists my conversations', await p.locator('.chat-row').count() === 3);
+  await p.locator('.chat-row', { hasText: 'Abdullah Rashed Alrumi' }).click(); await p.waitForTimeout(700);
+  ok('conversation opens with its messages', await p.locator('#msgs .msg').count() === 3 && /college template/.test(await p.textContent('#msgs')));
+  await p.fill('#msg-input', 'The outline is ready, I will upload it today.'); await p.click('#composer button[type=submit]'); await p.waitForTimeout(800);
+  ok('student sends a message', /outline is ready/.test(await p.locator('#msgs .msg.mine').last().innerText()));
+  await p.screenshot({ path: SHOTS + '/12_chat.png' });
+  await p.locator('.chat-row', { hasText: 'Supply Chain Analyst Trainee' }).click(); await p.waitForTimeout(700);
+  ok('opening a conversation clears its unread count', (await p.locator('#chat-count').isHidden()) || (await p.textContent('#chat-count')).trim() === '1', await p.textContent('#chat-count'));
+  await p.click('.hero-btn'); await p.waitForTimeout(300);
+  ok('new message suggests my supervisor, company and the COOP office', await p.locator('#contacts .contact').count() === 3, await p.locator('#contacts').innerText());
+  await p.fill('#lookup', 'nobody@nowhere.sa'); await p.click('#lookup-form button[type=submit]'); await p.waitForTimeout(300);
+  ok('unknown e-mail shows an error', /No E-COOP account/.test(await p.textContent('#lookup-error')));
+  await p.fill('#lookup', 'coop.office@jic.edu.sa'); await p.click('#lookup-form button[type=submit]'); await p.waitForTimeout(900);
+  ok('new conversation opens by e-mail', (await p.textContent('#thread-name')) === 'COOP Office' && await p.locator('.chat-row').count() === 4, await p.textContent('#thread-name'));
+  await p.fill('#msg-input', 'Hello, when is the final report due?'); await p.press('#msg-input', 'Enter'); await p.waitForTimeout(800);
+  await ctx.close();
+  ({ ctx, p } = await open('ar'));
+  await login(p, 'abdullah.alrumi@jic.edu.sa');
+  await p.goto(BASE + '/supervisor/chat.html'); await p.waitForTimeout(700);
+  const row = p.locator('.chat-row', { hasText: 'Ahmed Abdulmohsen Almousa' });
+  ok('supervisor sees the student message as unread', /outline is ready/.test(await row.innerText()) && await row.locator('.chat-badge').count() === 1);
+  await row.click(); await p.waitForTimeout(700);
+  await p.fill('#msg-input', 'ممتاز، بانتظار الملف.'); await p.click('#composer button[type=submit]'); await p.waitForTimeout(800);
+  ok('supervisor answers (Arabic page)', /بانتظار الملف/.test(await p.locator('#msgs .msg.mine').last().innerText()) && await p.evaluate(() => document.documentElement.dir === 'rtl'));
+  await p.screenshot({ path: SHOTS + '/13_chat_ar.png' });
+  await ctx.close();
+  ({ ctx, p } = await open());
+  await login(p, 'coop.office@jic.edu.sa');
+  await p.goto(BASE + '/admin/chat.html'); await p.waitForTimeout(700);
+  ok('admin receives the new conversation, not other people\'s chats', /final report due/.test(await p.textContent('#chat-list')) && !/college template/.test(await p.textContent('#chat-list')) && await p.locator('.chat-row').count() === 2);
+  await ctx.close();
+  ({ ctx, p } = await open());
+  await p.setViewportSize({ width: 390, height: 844 });
+  await login(p, 'ahmed.almousa@jic.edu.sa');
+  await p.goto(BASE + '/student/chat.html'); await p.waitForTimeout(700);
+  await p.locator('.chat-row').first().click(); await p.waitForTimeout(600);
+  ok('chat on a phone: conversation replaces the list, no sideways scrolling', await p.isHidden('#chat-list') && await p.isVisible('.thread-back') && !(await p.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1)));
+  await p.screenshot({ path: SHOTS + '/14_chat_phone.png' });
   await ctx.close();
 
   // ---------- register

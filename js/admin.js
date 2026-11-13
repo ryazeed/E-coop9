@@ -62,9 +62,9 @@ function renderApprovals() {
       buttons("decide('companyDecision', '" + c.id + "', 'Approved')", "decide('companyDecision', '" + c.id + "', 'Rejected')")];
   }), 5, t('nothingPending')));
   setHTML('opps-body', tableRows(opps.map(function (o) {
-    return [esc(o.title), esc(companyName(o.company)), esc(o.majors), o.capacity,
+    return [esc(o.title), esc(companyName(o.company)), esc(o.majors), o.capacity, o.minGpa || '—',
       buttons("decide('oppDecision', '" + o.id + "', 'Open')", "decide('oppDecision', '" + o.id + "', 'Rejected')")];
-  }), 5, t('nothingPending')));
+  }), 6, t('nothingPending')));
 }
 
 function buttons(onApprove, onReject) {

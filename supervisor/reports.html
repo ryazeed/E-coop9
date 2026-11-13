@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title data-t="reportsTitle">Reports · E-COOP</title>
-<link rel="icon" href="../images/logo.png">
+<link rel="icon" href="../images/icon.png">
 <link rel="stylesheet" href="../css/style.css">
 <script src="../js/lang.js"></script>
 </head>
@@ -12,13 +12,14 @@
 <!-- ===== header: logo, menu, notifications, language, account ===== -->
 <header class="topbar">
   <div class="wrap topbar-in">
-    <a class="brand" href="students.html"><img src="../images/logo.png" alt=""> E-COOP</a>
+    <a class="brand" href="students.html"><img src="../images/logo.png" alt="E-COOP logo" width="800" height="452"><span>E-COOP</span></a>
     <nav class="nav" aria-label="Main menu">
-      <a href="students.html" data-t="navStudents">Students</a>
-      <a href="attendance.html" data-t="navAttendance">Attendance</a>
-      <a href="reports.html" class="active" data-t="navReports">Reports</a>
-      <a href="evaluations.html" data-t="navEvaluations">Evaluations</a>
-      <a href="academic.html" data-t="navAcademicReports">Academic Reports</a>
+      <a href="students.html"><span data-t="navStudents">Students</span></a>
+      <a href="attendance.html"><span data-t="navAttendance">Attendance</span></a>
+      <a href="reports.html" class="active"><span data-t="navReports">Reports</span></a>
+      <a href="evaluations.html"><span data-t="navEvaluations">Evaluations</span></a>
+      <a href="academic.html"><span data-t="navAcademicReports">Academic Reports</span></a>
+      <a href="chat.html"><span data-t="navChat">Chat</span><span class="nav-count" id="chat-count" hidden>0</span></a>
     </nav>
     <div class="top-actions">
       <button class="top-btn" type="button" onclick="toggleNotifications()">&#128276; <span class="txt" data-t="notifications">Notifications</span><span class="count" id="notif-count" hidden>0</span></button>

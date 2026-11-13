@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 const ACTIONS = ['apply', 'appDecision', 'postOpp', 'oppDecision', 'companyDecision', 'genCode', 'checkIn', 'attDecision',
     'submitReport', 'reportDecision', 'submitEval', 'userStatus', 'assign', 'profile', 'readNotifs', 'pref', 'contact',
-    'companyProfile', 'logExport', 'avatar'];
+    'companyProfile', 'logExport', 'avatar', 'newChat', 'sendMsg', 'readChat'];
 
 function run_action(array $a): void {
     $type = (string)($a['type'] ?? '');
@@ -48,6 +48,11 @@ function act_apply(array $a): void {                                   // UC-03
     $o = one('SELECT o.*, c.user_id AS cuser FROM coop_opportunities o JOIN companies c ON c.company_id = o.company_id WHERE o.opportunity_id = ?', [$oid]);
     if (!$o) fail('Opportunity not found.', 'not_found', 404);
     if (val('SELECT 1 FROM applications WHERE student_id = ? AND opportunity_id = ?', [$u['student_id'], $oid])) fail('You already applied to this opportunity.', 'duplicate');
+    if ($o['min_gpa'] !== null) {                                      // minimum GPA set by the company
+        $gpa = val('SELECT gpa FROM students WHERE student_id = ?', [$u['student_id']]);
+        if ($gpa === null) fail('Add your GPA in Settings before applying to this opportunity.', 'gpa_missing');
+        if ((float)$gpa < (float)$o['min_gpa']) fail('Your GPA (' . number_format((float)$gpa, 2) . ') is below the minimum GPA for this opportunity (' . number_format((float)$o['min_gpa'], 2) . ').', 'gpa_low');
+    }
     tx(function () use ($u, $o, $oid) {
         q('INSERT INTO applications (student_id, opportunity_id) VALUES (?, ?)', [$u['student_id'], $oid]);   // trigger: approved opp, no placement
         $appId = (int)db()->lastInsertId();
@@ -141,6 +146,9 @@ function act_postOpp(array $a): void {                                 // UC-08
     $title = text_in($o, 'title', 150); $city = text_in($o, 'city', 80); $desc = text_in($o, 'description', 4000);
     $cap = (int)($o['capacity'] ?? 0);
     if ($cap < 1 || $cap > 100) fail('Capacity must be between 1 and 100.', 'validation');
+    $minGpa = trim((string)($o['minGpa'] ?? ''));                      // optional: empty = no minimum
+    if ($minGpa !== '' && (!is_numeric($minGpa) || $minGpa < 0 || $minGpa > 5)) fail('Minimum GPA must be between 0 and 5.', 'validation');
+    $minGpa = $minGpa === '' ? null : round((float)$minGpa, 2);
     $majors = is_array($o['majors'] ?? null) ? $o['majors'] : array_filter(array_map('trim', explode(',', (string)($o['majors'] ?? ''))));
     if (!$majors) fail('Choose at least one major.', 'validation');
     $ids = [];
@@ -149,8 +157,8 @@ function act_postOpp(array $a): void {                                 // UC-08
         if (!$id) fail('Unknown major: ' . $m, 'validation');
         $ids[] = (int)$id;
     }
-    tx(function () use ($u, $title, $city, $desc, $cap, $ids) {
-        q('INSERT INTO coop_opportunities (company_id, title, description, city, capacity) VALUES (?,?,?,?,?)', [$u['company_id'], $title, $desc, $city, $cap]);
+    tx(function () use ($u, $title, $city, $desc, $cap, $minGpa, $ids) {
+        q('INSERT INTO coop_opportunities (company_id, title, description, city, capacity, min_gpa) VALUES (?,?,?,?,?,?)', [$u['company_id'], $title, $desc, $city, $cap, $minGpa]);
         $oid = (int)db()->lastInsertId();
         foreach (array_unique($ids) as $mid) q('INSERT INTO opportunity_majors (opportunity_id, major_id) VALUES (?, ?)', [$oid, $mid]);
         notify_admins('nOppNew', ['o' => $title]);
@@ -361,6 +369,52 @@ function act_contact(array $a): void {                                 // landin
         notify_admins('nContact', ['n' => $name, 'e' => $email, 'x' => (string)($m['topic'] ?? $topic),
             'm' => mb_strlen($msg) > 120 ? mb_substr($msg, 0, 117) . '…' : $msg]);
     });
+}
+
+/* ================================================================ CHAT (all roles) */
+function my_conversation(array $u, $chatId): int {                     // the conversation id, only if I am a member
+    $cid = nid($chatId);
+    if (!val('SELECT 1 FROM conversation_members WHERE conversation_id = ? AND user_id = ?', [$cid, $u['user_id']])) {
+        fail('You are not a member of this conversation.', 'forbidden', 403);
+    }
+    return $cid;
+}
+
+function act_newChat(array $a): void {                                 // open a direct conversation with another user
+    $u = require_user();
+    $other = nid($a['user'] ?? '');
+    if ($other === (int)$u['user_id']) fail('You cannot message yourself.', 'validation');
+    $t = one('SELECT user_id, account_status FROM users WHERE user_id = ?', [$other]);
+    if (!$t) fail('User not found.', 'not_found', 404);
+    if ($t['account_status'] !== 'Active') fail('This account is suspended and cannot receive messages.', 'rule');
+    $exists = val("SELECT c.conversation_id FROM conversations c
+                   JOIN conversation_members a ON a.conversation_id = c.conversation_id AND a.user_id = ?
+                   JOIN conversation_members b ON b.conversation_id = c.conversation_id AND b.user_id = ?
+                   WHERE c.kind = 'Direct' LIMIT 1", [$u['user_id'], $other]);
+    if ($exists) return;                                               // one direct conversation per pair
+    tx(function () use ($u, $other) {
+        q("INSERT INTO conversations (kind, created_by) VALUES ('Direct', ?)", [$u['user_id']]);
+        $cid = (int)db()->lastInsertId();
+        q('INSERT INTO conversation_members (conversation_id, user_id, last_read_at) VALUES (?, ?, NOW()), (?, ?, NULL)', [$cid, $u['user_id'], $cid, $other]);
+    });
+}
+
+function act_sendMsg(array $a): void {
+    $u = require_user();
+    $cid = my_conversation($u, $a['chat'] ?? '');
+    $text = trim((string)($a['text'] ?? ''));
+    if ($text === '') fail('Write a message first.', 'validation');
+    if (mb_strlen($text) > 1000) fail('Messages can be up to 1,000 characters.', 'validation');
+    tx(function () use ($u, $cid, $text) {
+        q('INSERT INTO messages (conversation_id, sender_id, body) VALUES (?, ?, ?)', [$cid, $u['user_id'], $text]);
+        q('UPDATE conversation_members SET last_read_at = NOW() WHERE conversation_id = ? AND user_id = ?', [$cid, $u['user_id']]);
+    });
+}
+
+function act_readChat(array $a): void {                                // mark a conversation as read
+    $u = require_user();
+    $cid = my_conversation($u, $a['chat'] ?? '');
+    q('UPDATE conversation_members SET last_read_at = NOW() WHERE conversation_id = ? AND user_id = ?', [$cid, $u['user_id']]);
 }
 
 /* ================================================================ uploads (shared with upload.php / file.php) */

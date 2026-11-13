@@ -156,6 +156,46 @@ r = ahmed.act(type='profile', fields={'phone': '0551234000', 'gpa': '4.30', 'cv'
 check('student profile saved', [x for x in r['state']['students'] if x['id'] == 's1'][0]['gpa'] == '4.30', r.get('error'))
 check('bad GPA refused (CHECK)', ahmed.act(type='profile', fields={'phone': '', 'gpa': '7', 'cv': ''}, userFields={'name': 'Ahmed'})['code'] == 'validation')
 r = east.act(type='companyProfile', name='Eastern Logistics Co.', city='Dammam', phone='0138001201'); check('company profile saved (UC-07)', r['ok'], r.get('error'))
+# ---------------------------------------------------------------- minimum GPA of an opportunity
+yz = U('yazeed.alqahtani@jic.edu.sa')                                     # GPA 4.40, not placed
+o8 = [o for o in yz.state()['state']['opps'] if o['id'] == 'o8'][0]
+check('opportunity carries its minimum GPA', o8['minGpa'] == '4.50' and [o for o in yz.state()['state']['opps'] if o['id'] == 'o4'][0]['minGpa'] == '')
+r = yz.act(type='apply', opp='o8'); check('GPA below the minimum cannot apply', r['code'] == 'gpa_low' and not [x for x in r['state']['apps'] if x['student'] == 's6' and x['opp'] == 'o8'], r)
+r = east.act(type='postOpp', opp={'title': 'Finance Analyst Trainee', 'city': 'Dammam', 'majors': 'Business Administration', 'capacity': 1, 'minGpa': '4.40', 'description': 'Prepare monthly cost reports.'})
+fin = [o for o in r['state']['opps'] if o['title'] == 'Finance Analyst Trainee']
+check('company posts an opportunity with a minimum GPA', r['ok'] and fin and fin[0]['minGpa'] == '4.40', r.get('error'))
+check('minimum GPA must be 0 to 5', east.act(type='postOpp', opp={'title': 'Bad GPA Trainee', 'city': 'Dammam', 'majors': 'Business Administration', 'capacity': 1, 'minGpa': '6', 'description': 'x'})['code'] == 'validation')
+admin.act(type='oppDecision', id=fin[0]['id'], status='Open')
+r = yz.act(type='apply', opp=fin[0]['id']); check('GPA equal to the minimum can apply', r['ok'], r.get('error'))
+yz.act(type='profile', fields={'phone': '', 'gpa': '', 'cv': ''}, userFields={'name': 'Yazeed Mubarak Alqahtani'})
+check('student without a GPA cannot apply when a minimum is set', yz.act(type='apply', opp='o7')['code'] == 'gpa_missing')
+check('student without a GPA can apply when there is no minimum', yz.act(type='apply', opp=new[0]['id'])['ok'])
+
+# ---------------------------------------------------------------- chat
+anas = U('anas.alamri@jic.edu.sa'); a1 = U('ahmed.almousa@jic.edu.sa')
+st = a1.state()['state']
+check('chat: a user gets only own conversations', {c['id'] for c in st['chats']} == {'ch1', 'ch2', 'ch6'} and all(m['chat'] in ('ch1', 'ch2', 'ch6') for m in st['msgs']), [c['id'] for c in st['chats']])
+check('chat: guest gets no conversations', g.state()['state']['chats'] == [] and g.state()['state']['msgs'] == [])
+check('chat: admin does not see other people\'s conversations', {c['id'] for c in admin.state()['state']['chats']} == {'ch4'})
+r = a1.act(type='sendMsg', chat='ch2', text='I will send the outline tomorrow.')
+check('chat: member sends a message', r['ok'] and r['state']['msgs'][-1]['text'] == 'I will send the outline tomorrow.' and r['state']['msgs'][-1]['from'] == 'u1', r.get('error'))
+def unread(u, chat):
+    s = u.state()['state']; me = u.state()['me']; c = [x for x in s['chats'] if x['id'] == chat][0]
+    return len([m for m in s['msgs'] if m['chat'] == chat and m['from'] != me and m['ts'] > c['lastRead']])
+check('chat: the other member sees it as unread', unread(alrumi, 'ch2') == 1, unread(alrumi, 'ch2'))
+alrumi.act(type='readChat', chat='ch2'); check('chat: opening the conversation marks it read', unread(alrumi, 'ch2') == 0)
+check('chat: non-member cannot send', anas.act(type='sendMsg', chat='ch2', text='hi').get('code') == 'forbidden' and anas.status == 403)
+check('chat: non-member cannot mark read', anas.act(type='readChat', chat='ch2').get('code') == 'forbidden')
+check('chat: empty message refused', a1.act(type='sendMsg', chat='ch2', text='   ')['code'] == 'validation')
+check('chat: message over 1000 characters refused', a1.act(type='sendMsg', chat='ch2', text='x' * 1001)['code'] == 'validation')
+r = a1.act(type='sendMsg', chat='ch2', text='<script>alert(1)</script>'); check('chat: text is stored as plain text', r['ok'] and r['state']['msgs'][-1]['text'] == '<script>alert(1)</script>')
+r = anas.act(type='newChat', user='u15'); new = [c for c in r['state']['chats'] if c['kind'] == 'direct' and set(c['members']) == {'u2', 'u15'}]
+check('chat: start a new direct conversation', r['ok'] and len(new) == 1, r.get('error'))
+r = anas.act(type='newChat', user='u15'); check('chat: one direct conversation per pair', len([c for c in r['state']['chats'] if set(c['members']) == {'u2', 'u15'}]) == 1)
+check('chat: cannot message yourself', anas.act(type='newChat', user='u2')['code'] == 'validation')
+check('chat: cannot message a suspended account', anas.act(type='newChat', user='u8')['code'] == 'rule')
+check('chat: sign-in required', U().act(type='sendMsg', chat='ch1', text='hi').get('code') == 'auth')
+
 check('logout ends the session', ahmed.post('auth.php', op='logout')['me'] is None and ahmed.act(type='readNotifs')['code'] == 'auth')
 
 n = sum(1 for r in results if r[1]); print(f'\n{n} / {len(results)} passed')
